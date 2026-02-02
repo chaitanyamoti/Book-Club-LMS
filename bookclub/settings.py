@@ -192,6 +192,39 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
+print("EMAIL_BACKEND =", EMAIL_BACKEND)
+
+
+# Production Security Settings (HTTPS, HSTS, Cookies, CSP)
+# These should generally only be active when DEBUG is False
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True # Optional, but good for maximum security
+
+    # Content Security Policy (CSP) - Implement carefully!
+    # This is a very basic example. You will need to customize this
+    # heavily based on all the external resources your site uses.
+    # CSP should ideally be tested thoroughly in a staging environment.
+    SECURE_CONTENT_SECURITY_POLICY = {
+        "default-src": ("'self'",),
+        "script-src": ("'self'", "https://cdn.jsdelivr.net"), # Add any CDN for JS, like Bootstrap's
+        "style-src": ("'self'", "https://cdn.jsdelivr.net"), # Add any CDN for CSS
+        "img-src": ("'self'", "data:",), # Allow data URIs for images
+        "font-src": ("'self'", "https://cdn.jsdelivr.net"), # Add any CDN for fonts
+        "connect-src": ("'self'",),
+        "frame-ancestors": ("'self'",),
+        "form-action": ("'self'",),
+        "base-uri": ("'self'",),
+        "object-src": ("'none'",),
+        "script-src-attr": ("'none'",),
+        "upgrade-insecure-requests": True,
+    }
+
+
 # JAZZMIN SETTINGS (Modern Admin Theme)
 JAZZMIN_SETTINGS = {
     "site_title": "Book Club Admin",

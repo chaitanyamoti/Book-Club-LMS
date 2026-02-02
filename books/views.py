@@ -1,9 +1,18 @@
-from django.views.generic import ListView, DetailView
-from django.shortcuts import render
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.shortcuts import render, redirect
 from django.db.models import Q
 from core.models import Book
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin # Import these mixins
+from django.utils.decorators import method_decorator
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+import json, csv
+from .forms import BookForm
 
 
+@method_decorator(login_required(login_url='users:login'), name='dispatch')
 class BookListView(ListView):
     model = Book
     template_name = 'books/book_list.html'
@@ -18,6 +27,7 @@ class BookListView(ListView):
         return qs
 
 
+@method_decorator(login_required(login_url='users:login'), name='dispatch')
 class BookDetailView(DetailView):
     model = Book
     template_name = 'books/book_detail.html'
@@ -25,27 +35,24 @@ class BookDetailView(DetailView):
 
 
 # Create and Update views for registering books
-from django.views.generic import CreateView, UpdateView
-from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
-import json, csv
-from .forms import BookForm
+
+class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_staff or self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        # Redirect to the dashboard or a permission denied page if not staff/superuser
+        return redirect('core:dashboard')
 
 
-@method_decorator(login_required, name='dispatch')
-class BookCreateView(CreateView):
+class BookCreateView(StaffRequiredMixin, CreateView): # Apply the mixin
     model = Book
     form_class = BookForm
     template_name = 'books/book_form.html'
     success_url = reverse_lazy('books:book_table')
 
 
-@method_decorator(login_required, name='dispatch')
-class BookUpdateView(UpdateView):
+class BookUpdateView(StaffRequiredMixin, UpdateView): # Apply the mixin
     model = Book
     form_class = BookForm
     template_name = 'books/book_form.html'
@@ -55,6 +62,10 @@ class BookUpdateView(UpdateView):
 @login_required
 def book_table(request):
     """Display all books in an excel-like table. If ?export=csv provided, return CSV."""
+    # Ensure only staff can access this view
+    if not (request.user.is_staff or request.user.is_superuser):
+        return redirect('core:dashboard') # Redirect non-staff to dashboard
+
     qs = Book.objects.all().order_by('id')
 
     # Export CSV
@@ -77,6 +88,10 @@ from django.forms.models import model_to_dict
 @csrf_exempt
 def book_table_update(request):
     """Accept JSON POST of changed rows and update books accordingly."""
+    # Ensure only staff can access this view
+    if not (request.user.is_staff or request.user.is_superuser):
+        return JsonResponse({'error': 'Permission denied'}, status=403)
+
     if request.method != 'POST':
         return HttpResponseBadRequest('Invalid method')
 

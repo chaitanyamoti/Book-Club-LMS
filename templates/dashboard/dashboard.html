@@ -5,9 +5,11 @@
 {% block page_description %}Overview of your reading activity and available books{% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'books:book_list' %}" class="btn btn-primary">
+{% if request.user.is_staff or request.user.is_superuser %}
+<a href="{% url 'books:book_add' %}" class="btn btn-primary">
     <i class="bi bi-plus-circle me-1"></i>Add Book
 </a>
+{% endif %}
 <a href="{% url 'reading:create_reading_log' %}" class="btn btn-outline-primary">
     <i class="bi bi-journal-plus me-1"></i>Log Reading
 </a>

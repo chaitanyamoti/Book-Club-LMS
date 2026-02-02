@@ -25,8 +25,8 @@ class UserRegistrationForm(UserCreationForm):
 
 
 class CustomLoginForm(forms.Form):
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'autocomplete': 'off'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'autocomplete': 'off'}))
 
 
 class UserProfileForm(forms.ModelForm):

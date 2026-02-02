@@ -42,10 +42,11 @@ def send_overdue(request):
     return JsonResponse({'error': 'POST only'})
 
 
-class AnnouncementListView(ListView):
+class AnnouncementListView(LoginRequiredMixin, ListView): # Added LoginRequiredMixin
     model = Announcement
     template_name = 'notifications/announcement_list.html'
     context_object_name = 'announcements'
+    login_url = 'users:login' # Specify the login URL
 
     def get_queryset(self):
         today = timezone.now()
