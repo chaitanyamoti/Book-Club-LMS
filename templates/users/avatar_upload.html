@@ -1,0 +1,46 @@
+{% extends 'base_dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Upload Avatar{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-upload me-2"></i>Upload Profile Picture
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    {% if user.userprofile.avatar %}
+                        <img src="{{ user.userprofile.avatar.url }}" alt="Current Avatar" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                        <p class="text-muted">Current avatar</p>
+                    {% else %}
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px; font-size: 2rem;">
+                            {{ user.first_name|first|default:user.username|first|upper }}
+                        </div>
+                        <p class="text-muted">No avatar uploaded</p>
+                    {% endif %}
+                </div>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload me-1"></i>Upload Avatar
+                        </button>
+                    </div>
+                </form>
+                <hr>
+                <div class="text-center">
+                    <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

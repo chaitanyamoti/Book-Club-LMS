@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Scan Result
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h3>Transaction Result</h3>
+                </div>
+                <div class="card-body">
+                    {% if message %}
+                        <div class="alert alert-success" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+
+                    {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endif %}
+
+                    {% if book %}
+                        <div class="mt-4">
+                            <h4>{{ book.title }}</h4>
+                            <p>by {{ book.author }}</p>
+                            {% if book.cover_image %}
+                                <img src="{{ book.cover_image.url }}" alt="Cover of {{ book.title }}" class="img-fluid" style="max-height: 300px;">
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'home' %}" class="btn btn-primary">Go to Home</a>
+                    <a href="{% url 'transactions:transaction_list' %}" class="btn btn-secondary">View All Transactions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

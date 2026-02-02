@@ -1,0 +1,53 @@
+{% extends 'base_dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}Delete Account{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Delete Account
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Warning: This action cannot be undone!</h6>
+                    <p class="mb-0">Once you delete your account:</p>
+                    <ul class="mb-0">
+                        <li>All your personal data will be permanently removed</li>
+                        <li>You will lose access to all your reading history</li>
+                        <li>Your book requests and transactions will be deleted</li>
+                        <li>You cannot recover your account or data</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-2"></i>Before you proceed:</h6>
+                    <ul class="mb-0">
+                        <li>Return any books you currently have issued</li>
+                        <li>Download your data if needed (feature coming soon)</li>
+                        <li>Consider deactivating your account instead (temporary)</li>
+                    </ul>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Delete My Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

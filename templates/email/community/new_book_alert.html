@@ -1,0 +1,37 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}✨ New Book Alert: "{{ book.title }}"!{% endblock %}
+
+{% block header %}New Book in the Collection!{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+    <p>Exciting news! A fantastic new book has just been added to our collection:</p>
+
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #007bff;">{{ book.title }}</h3>
+        <p><strong>By:</strong> {{ book.author }}</p>
+        {% if book.genre %}
+            <p><strong>Genre:</strong> {{ book.genre }}</p>
+        {% endif %}
+        <p>{{ book.description|truncatechars:200 }}</p>
+        {% if book.cover_image %}
+            <div style="text-align: center; margin-top: 15px;">
+                <img src="{{ site_url }}{{ book.cover_image.url }}" alt="{{ book.title }}" style="max-width: 150px; height: auto; border-radius: 5px;">
+            </div>
+        {% endif %}
+    </div>
+
+    <p>Be one of the first to check it out!</p>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ site_url }}{% url 'books:book_detail' book.id %}" class="button">View Book Details</a>
+        <a href="{{ site_url }}{% url 'books:book_list' %}" class="button" style="background: #28a745; margin-left: 10px;">Browse All Books</a>
+    </div>
+
+    <p>Happy reading!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

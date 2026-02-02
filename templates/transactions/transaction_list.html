@@ -1,0 +1,49 @@
+{% extends 'base_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Transactions</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Book</th>
+        <th>User</th>
+        <th>Type</th>
+        <th>Issue Date</th>
+        <th>Due Date</th>
+        <th>Return Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tx in transactions %}
+      <tr>
+        <td>{{ tx.id }}</td>
+        <td>{{ tx.book.title }}</td>
+        <td>{{ tx.user.username }}</td>
+        <td>{{ tx.transaction_type }}</td>
+        <td>{{ tx.issue_date }}</td>
+        <td>{{ tx.due_date }}</td>
+        <td>{{ tx.return_date|default:'-' }}</td>
+        <td>
+          {% if not tx.return_date %}
+            {# Extend button is visible to the user who owns the transaction #}
+            {% if request.user == tx.user %}
+              <a href="{% url 'transactions:extend_due_date' tx.pk %}" class="btn btn-sm btn-info">Extend</a>
+            {% endif %}
+
+            {# Return button is visible only to staff #}
+            {% if request.user.is_staff or request.user.is_superuser %}
+              <a href="{% url 'transactions:return_book' tx.pk %}" class="btn btn-sm btn-success">Return</a>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8">No transactions found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

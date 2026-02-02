@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overdue Book Reminder</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+        <h2 style="color: #d9534f; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+            Overdue Book Reminder
+        </h2>
+        <p>Hi {{ user.get_full_name|default:user.username }},</p>
+        <p>This is a friendly reminder that the following book(s) you borrowed from the Book Club are now overdue:</p>
+        
+        {% for tx_info in overdue_transactions %}
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p><strong>Book Title:</strong> {{ tx_info.book.title }}</p>
+            <p><strong>Author:</strong> {{ tx_info.book.author }}</p>
+            <p style="color: #d9534f;"><strong>Due Date:</strong> {{ tx_info.due_date|date:"F d, Y" }}</p>
+            <p><strong>Days Overdue:</strong> {{ tx_info.days_overdue }}</p>
+        </div>
+        {% endfor %}
+
+        <p>
+            Please return the book(s) as soon as possible to make them available for other members. If you believe this is an error, or if you have already returned the book(s), please contact us.
+        </p>
+        <p>Thank you,</p>
+        <p><strong>The Book Club Team</strong></p>
+    </div>
+</body>
+</html>

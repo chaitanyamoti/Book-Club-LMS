@@ -1,0 +1,49 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}Your Monthly Reading Summary - {{ month_name }} {{ year }}{% endblock %}
+
+{% block header %}Your Monthly Reading Summary{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+    <p>Here's a look back at your reading journey for <strong>{{ month_name }} {{ year }}</strong>:</p>
+
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h4 style="text-align: center; color: #007bff;">Your Reading Highlights</h4>
+        <ul style="list-style-type: none; padding: 0;">
+            <li style="margin-bottom: 10px;">
+                <strong>📚 Books Completed:</strong> {{ books_completed }}
+            </li>
+            <li style="margin-bottom: 10px;">
+                <strong>📖 Total Pages Read:</strong> {{ total_pages_read }}
+            </li>
+            <li style="margin-bottom: 10px;">
+                <strong>⏱️ Total Minutes Read:</strong> {{ total_minutes_read }}
+            </li>
+        </ul>
+    </div>
+
+    {% if books_read_list %}
+        <h4>Books You Read This Month:</h4>
+        <ul style="list-style-type: none; padding: 0;">
+            {% for book in books_read_list %}
+                <li style="margin-bottom: 5px;"><strong>{{ book.title }}</strong> by {{ book.author }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>It looks like you didn't log any books this month. Don't worry, every reading journey has its pauses!</p>
+    {% endif %}
+
+    <h4>💡 Keep Exploring!</h4>
+    <p>Ready for your next adventure?</p>
+    <div style="text-align: center; margin: 20px 0;">
+        <a href="/books/" class="button">Discover New Books</a>
+        <a href="/reading/add/" class="button" style="background: #28a745; margin-left: 10px;">Log Your Next Read</a>
+    </div>
+
+    <p>Thank you for being an active member of our Book Club!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

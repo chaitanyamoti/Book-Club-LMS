@@ -1,0 +1,56 @@
+{% extends 'base_dashboard.html' %}
+
+{% block page_title %}Active Sessions{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-desktop me-2"></i>Active Sessions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> This is a simplified session management view. In a production environment, you would have full session tracking with the ability to terminate specific sessions.
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">
+                                    <i class="fas fa-laptop me-2"></i>Current Session
+                                    <span class="badge bg-success ms-2">Active</span>
+                                </h6>
+                                <small class="text-muted">
+                                    Device: {{ current_session.device }}<br>
+                                    IP: {{ current_session.ip }}<br>
+                                    Login Time: {{ current_session.login_time }}
+                                </small>
+                            </div>
+                            <div>
+                                <span class="text-muted small">This is your current session</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Coming Soon:</strong> Full session management with the ability to view and terminate other active sessions will be available in a future update.
+                </div>
+
+                <hr>
+                <div class="text-center">
+                    <a href="{% url 'users:profile' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "email/base.html" %}
+{% load static %}
+
+{% block subject %}Book Due Soon - {{ transaction.book.title }}{% endblock %}
+
+{% block content %}
+<h2>⏰ Book Due Reminder</h2>
+
+<p>Hi {{ transaction.user.get_full_name|default:transaction.user.username }},</p>
+
+<p>This is a friendly reminder that your borrowed book is due soon.</p>
+
+<div class="book-card">
+    <div style="display: flex; align-items: center;">
+        {% if transaction.book.cover_image %}
+        <img src="{{ transaction.book.cover_image.url }}" alt="{{ transaction.book.title }}" style="width: 80px; height: 120px; object-fit: cover; margin-right: 15px; border-radius: 5px;">
+        {% endif %}
+        <div>
+            <div class="book-title">{{ transaction.book.title }}</div>
+            <div class="book-author">by {{ transaction.book.author }}</div>
+            <p><strong>Due Date:</strong> {{ transaction.due_date|date:"F j, Y" }}</p>
+            <p><strong>Days Remaining:</strong>
+                {% if days_remaining > 0 %}
+                    <span style="color: #28a745; font-weight: bold;">{{ days_remaining }} days</span>
+                {% elif days_remaining == 0 %}
+                    <span style="color: #ffc107; font-weight: bold;">Due today</span>
+                {% else %}
+                    <span style="color: #dc3545; font-weight: bold;">{{ days_remaining|abs }} days overdue</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+{% if days_remaining > 0 %}
+<div class="highlight" style="border-left-color: #28a745;">
+    <h3>✅ You're on Track!</h3>
+    <p>You have {{ days_remaining }} days remaining to return this book. Great job staying on schedule!</p>
+</div>
+{% elif days_remaining == 0 %}
+<div class="highlight" style="border-left-color: #ffc107;">
+    <h3>⚠️ Due Today</h3>
+    <p>This book is due today. Please return it at your earliest convenience to avoid any late fees.</p>
+</div>
+{% else %}
+<div class="highlight" style="border-left-color: #dc3545;">
+    <h3>🚨 Overdue Notice</h3>
+    <p>This book is {{ days_remaining|abs }} days overdue. Please return it immediately to avoid additional fines.</p>
+</div>
+{% endif %}
+
+<h3>🔄 Easy Return Options</h3>
+<div style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div style="text-align: center;">
+        <p><strong>📱 Quick Return</strong></p>
+        {% if transaction.book.qr_code %}
+        <img src="{{ transaction.book.qr_code.url }}" alt="QR Code" style="width: 80px; height: 80px;">
+        <p>Scan QR code</p>
+        {% endif %}
+    </div>
+    <div style="text-align: center;">
+        <p><strong>💻 Online Return</strong></p>
+        <p>Return via dashboard</p>
+    </div>
+    <div style="text-align: center;">
+        <p><strong>🏛️ In Person</strong></p>
+        <p>Visit the library</p>
+    </div>
+</div>
+
+<h3>📅 Need More Time?</h3>
+<p>If you need additional time to finish reading:</p>
+<ul>
+    <li>Request an extension through your dashboard</li>
+    <li>Extensions are typically granted for up to 14 days</li>
+    <li>Multiple extensions may not be available</li>
+</ul>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="/transactions/" class="button">View My Books</a>
+    {% if days_remaining >= 0 %}
+    <a href="{% url 'transactions:extend_due_date' transaction.pk %}" class="button" style="background: #ffc107; color: #000; margin-left: 10px;">Request Extension</a>
+    {% endif %}
+</div>
+
+<p>If you have any questions about your loan or need assistance, please don't hesitate to contact us.</p>
+
+<p>Thank you for being a valued member of our Book Club!</p>
+
+<p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this email because you have books due soon at our library.</p>
+<p>
+    <a href="{% url 'transactions:transaction_list' %}">View All Loans</a> |
+    <a href="{% url 'users:settings' %}">Email Preferences</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

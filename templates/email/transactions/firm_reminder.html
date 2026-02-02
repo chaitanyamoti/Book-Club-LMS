@@ -1,0 +1,76 @@
+{% extends "email/base.html" %}
+{% load static %}
+
+{% block subject %}⚠️ Important: {{ transaction.book.title }} due tomorrow{% endblock %}
+
+{% block content %}
+<h2>⚠️ Important Reminder</h2>
+
+<p>Hi {{ transaction.user.get_full_name|default:transaction.user.username }},</p>
+
+<div class="highlight" style="border-left-color: #ffc107; background-color: #fff3cd;">
+    <h3 style="color: #856404;">Your book is due tomorrow!</h3>
+    <p>Please make sure to return <strong>{{ transaction.book.title }}</strong> by tomorrow to avoid any late fees.</p>
+</div>
+
+<div class="book-card">
+    <div style="display: flex; align-items: center;">
+        {% if transaction.book.cover_image %}
+        <img src="{{ transaction.book.cover_image.url }}" alt="{{ transaction.book.title }}" style="width: 80px; height: 120px; object-fit: cover; margin-right: 15px; border-radius: 5px;">
+        {% endif %}
+        <div>
+            <div class="book-title">{{ transaction.book.title }}</div>
+            <div class="book-author">by {{ transaction.book.author }}</div>
+            <p><strong>Due Date:</strong> {{ transaction.due_date|date:"l, F j, Y" }}</p>
+            <p><strong>Days Remaining:</strong> <span style="color: #ffc107; font-weight: bold;">Due tomorrow</span></p>
+        </div>
+    </div>
+</div>
+
+<h3>🔄 Return Options</h3>
+<div style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div style="text-align: center;">
+        <p><strong>📱 Quick Return</strong></p>
+        {% if transaction.book.qr_code %}
+        <img src="{{ transaction.book.qr_code.url }}" alt="QR Code" style="width: 80px; height: 80px;">
+        <p>Scan QR code at return station</p>
+        {% else %}
+        <p>QR code will be generated soon</p>
+        {% endif %}
+    </div>
+    <div style="text-align: center;">
+        <p><strong>💻 Online Return</strong></p>
+        <p>Use the return button in your dashboard</p>
+    </div>
+    <div style="text-align: center;">
+        <p><strong>🏛️ In Person</strong></p>
+        <p>Return to the library during open hours</p>
+    </div>
+</div>
+
+<h3>📅 Need More Time?</h3>
+<p>If you need additional time to finish reading:</p>
+<ul>
+    <li>Request an extension through your dashboard</li>
+    <li>Extensions are typically granted for up to 14 days</li>
+    <li>Contact us if you have any questions</li>
+</ul>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{% url 'transactions:transaction_list' %}" class="button" style="background: #ffc107; color: #000;">Return Book Now</a>
+    <a href="{% url 'users:settings' %}" class="button" style="background: #6c757d; margin-left: 10px;">Request Extension</a>
+</div>
+
+<p>We appreciate your attention to this matter. Thank you for being a responsible member of our Book Club!</p>
+
+<p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this email because you have a book due tomorrow at our library.</p>
+<p>
+    <a href="{% url 'transactions:transaction_list' %}">View My Books</a> |
+    <a href="{% url 'users:settings' %}">Email Preferences</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

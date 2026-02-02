@@ -1,0 +1,17 @@
+{% extends 'base_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Your Reading Logs</h2>
+  <a class="btn btn-primary mb-3" href="{% url 'reading:create_reading_log' %}">Add Log</a>
+  <ul class="list-group">
+    {% for log in logs %}
+    <li class="list-group-item">
+      <strong>{{ log.book.title }}</strong> - {{ log.log_date }} - {{ log.progress }}% complete
+    </li>
+    {% empty %}
+    <li class="list-group-item">No reading logs yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

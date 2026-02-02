@@ -1,0 +1,22 @@
+{% extends 'base_dashboard.html' %}
+
+{% block page_title %}{{ challenge.name }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{{ challenge.name }}</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ challenge.description }}</p>
+                <p><strong>Goal:</strong> {{ challenge.goal_value }} {{ challenge.get_goal_type_display }}</p>
+                <p><strong>Starts:</strong> {{ challenge.start_date|date:"F j, Y" }}</p>
+                <p><strong>Ends:</strong> {{ challenge.end_date|date:"F j, Y" }}</p>
+                <a href="{% url 'reading:join_challenge' challenge.id %}" class="btn btn-primary">Join Challenge</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

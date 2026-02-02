@@ -1,0 +1,329 @@
+/* Dashboard Specific Styles */
+
+/* Skip Link for Accessibility */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    text-decoration: none;
+    z-index: 100;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.skip-link:focus {
+    top: 6px;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Sidebar */
+.sidebar {
+  min-height: 100vh;
+  width: 250px;
+  position: sticky;
+  top: 56px; /* Below navbar height */
+  overflow-y: auto;
+  transition: width 0.3s ease;
+}
+
+.nav-link {
+  color: #495057;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  background-color: #e9ecef;
+  color: #007bff;
+  transform: translateX(4px);
+}
+
+.nav-link.active {
+  background-color: #007bff;
+  color: white;
+  font-weight: 500;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: absolute;
+    top: 56px;
+    left: -250px;
+    transition: left 0.3s ease;
+    z-index: 999;
+  }
+  
+  .sidebar.show {
+    left: 0;
+  }
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Recent Activity */
+.activity-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Quick Actions */
+.quick-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.quick-action-btn i {
+    font-size: 1.2rem;
+}
+
+/* Overdue Alerts */
+.overdue-alert {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.overdue-alert .alert-link {
+    color: #491217;
+    font-weight: bold;
+}
+
+/* Reading Progress Cards */
+.reading-progress-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.reading-progress-card .card-title {
+    color: white;
+}
+
+.reading-progress-card .progress {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Member Dashboard */
+.member-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.member-stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.member-stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #007bff;
+    display: block;
+}
+
+.member-stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+/* Current Books */
+.current-book-card {
+    border-left: 4px solid #007bff;
+    transition: all 0.2s ease-in-out;
+}
+
+.current-book-card:hover {
+    border-left-color: #0056b3;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.due-date {
+    font-weight: bold;
+}
+
+.due-date.overdue {
+    color: #dc3545;
+}
+
+.due-date.due-soon {
+    color: #ffc107;
+}
+
+.due-date.on-time {
+    color: #28a745;
+}
+
+/* Reading Calendar */
+.reading-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 1rem;
+}
+
+.calendar-header {
+    display: contents;
+}
+
+.calendar-header div {
+    text-align: center;
+    font-weight: bold;
+    color: #6c757d;
+    font-size: 0.8rem;
+    padding: 5px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: relative;
+        min-height: auto;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .member-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-card {
+        margin-bottom: 1rem;
+    }
+
+    .quick-action-btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .sidebar {
+        background-color: #212529;
+    }
+
+    .dashboard-card {
+        background-color: #343a40;
+        color: #fff;
+    }
+
+    .stat-label {
+        color: #adb5bd;
+    }
+}
+/* Book Cards Hover Effects */
+
+.book-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.book-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+}
+
+.book-card-hover {
+  opacity: 0 !important;
+  transition: opacity 0.3s ease;
+}
+
+.book-card:hover .book-card-hover {
+  opacity: 1 !important;
+}

@@ -1,0 +1,43 @@
+{% extends 'base_dashboard.html' %}
+
+{% block page_title %}{{ group.name }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{{ group.name }}</h5>
+            </div>
+            <div class="card-body">
+                <p>{{ group.description }}</p>
+                <p><strong>Admin:</strong> {{ group.admin.get_full_name|default:group.admin.username }}</p>
+                {% if group.current_book %}
+                <p><strong>Currently Reading:</strong> {{ group.current_book.title }} by {{ group.current_book.author }}</p>
+                {% endif %}
+                <p><strong>Meeting Details:</strong> {{ group.meeting_details }}</p>
+                
+                <hr>
+                <h6>Members</h6>
+                <ul>
+                {% for membership in group.groupmembership_set.all %}
+                    <li>{{ membership.user.get_full_name|default:membership.user.username }}</li>
+                {% endfor %}
+                </ul>
+
+                <hr>
+                <h6>Invite a Member</h6>
+                <form action="." method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="username" class="form-control" placeholder="Enter username to invite">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-secondary">Invite</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

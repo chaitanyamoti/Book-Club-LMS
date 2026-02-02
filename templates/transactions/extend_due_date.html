@@ -1,0 +1,12 @@
+{% extends 'base_dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Extend Due Date for "{{ transaction.book.title }}"</h2>
+    <p>Current Due Date: {{ transaction.due_date }}</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Extend Due Date</button>
+    </form>
+</div>
+{% endblock %}

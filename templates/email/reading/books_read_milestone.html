@@ -1,0 +1,35 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}🏆 You've Read {{ books_read_count }} Books!{% endblock %}
+
+{% block header %}Reading Milestone Achieved!{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+    <p>Fantastic news! You've officially read <strong>{{ books_read_count }} books</strong> with our Book Club!</p>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <img src="https://via.placeholder.com/100x100?text=Milestone" alt="Reading Milestone Badge" style="width: 100px; height: 100px; object-fit: cover;">
+        <p style="font-size: 18px; font-weight: bold; color: #007bff; margin-top: 10px;">What an achievement!</p>
+    </div>
+
+    <p>Each book you complete adds to your knowledge and enriches your world. We're incredibly proud of your reading journey.</p>
+
+    <h4>Keep Discovering!</h4>
+    <ul>
+        <li>Explore new genres and authors from our collection.</li>
+        <li>Share your favorite reads with the community.</li>
+        <li>Set your next reading goal!</li>
+    </ul>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="/dashboard/" class="button">View My Dashboard</a>
+        <a href="/books/" class="button" style="background: #28a745; margin-left: 10px;">Find Your Next Book</a>
+    </div>
+
+    <p>Thank you for being an enthusiastic member of our Book Club!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

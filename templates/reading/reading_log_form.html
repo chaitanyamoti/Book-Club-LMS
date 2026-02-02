@@ -1,0 +1,128 @@
+{% extends 'base_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">📖 Update My Reading Progress</h4>
+          <small>Track your daily reading and see your progress grow!</small>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+
+            <!-- Book Selection (if applicable) -->
+            {% if form.book %}
+            <div class="mb-3">
+              <label for="{{ form.book.id_for_label }}" class="form-label">📚 Which book are you reading?</label>
+              {{ form.book }}
+              {% if form.book.errors %}
+                <div class="text-danger small">{{ form.book.errors }}</div>
+              {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Reading Today Checkbox -->
+            <div class="mb-3">
+              <div class="form-check">
+                {{ form.read_today }}
+                <label class="form-check-label fw-bold" for="{{ form.read_today.id_for_label }}">
+                  ✅ I read today
+                </label>
+              </div>
+              <small class="text-muted">Check this if you spent time reading today</small>
+            </div>
+
+            <!-- Pages Read -->
+            <div class="mb-3">
+              <label for="{{ form.pages_read.id_for_label }}" class="form-label">📄 Pages read today</label>
+              {{ form.pages_read }}
+              {% if form.pages_read.errors %}
+                <div class="text-danger small">{{ form.pages_read.errors }}</div>
+              {% endif %}
+              <small class="text-muted">How many pages did you read? (optional)</small>
+            </div>
+
+            <!-- Minutes Read -->
+            <div class="mb-3">
+              <label for="{{ form.minutes_read.id_for_label }}" class="form-label">⏱️ Minutes spent reading</label>
+              {{ form.minutes_read }}
+              {% if form.minutes_read.errors %}
+                <div class="text-danger small">{{ form.minutes_read.errors }}</div>
+              {% endif %}
+              <small class="text-muted">How long did you read for? (optional)</small>
+            </div>
+
+            <!-- Progress Percentage -->
+            {% if form.progress %}
+            <div class="mb-3">
+              <label for="{{ form.progress.id_for_label }}" class="form-label">📊 Book progress</label>
+              <div class="mb-2">
+                <input type="range" class="form-range" id="progressRange" min="0" max="100" value="{{ form.progress.value|default:0 }}">
+                <div class="d-flex justify-content-between">
+                  <small class="text-muted">0%</small>
+                  <span id="progressValue" class="fw-bold">{{ form.progress.value|default:0 }}%</span>
+                  <small class="text-muted">100%</small>
+                </div>
+              </div>
+              {{ form.progress }}
+              {% if form.progress.errors %}
+                <div class="text-danger small">{{ form.progress.errors }}</div>
+              {% endif %}
+              <small class="text-muted">How much of the book have you completed?</small>
+            </div>
+            {% endif %}
+
+            <!-- Notes -->
+            <div class="mb-3">
+              <label for="{{ form.notes.id_for_label }}" class="form-label">💭 Your thoughts</label>
+              {{ form.notes }}
+              {% if form.notes.errors %}
+                <div class="text-danger small">{{ form.notes.errors }}</div>
+              {% endif %}
+              <small class="text-muted">Share your thoughts, favorite parts, or what you learned (optional)</small>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg">
+                💾 Save My Progress
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Help Text -->
+      <div class="alert alert-info mt-3">
+        <h6><i class="fas fa-lightbulb"></i> Tips for tracking your reading:</h6>
+        <ul class="mb-0 small">
+          <li>Even 10 minutes counts! Every bit of reading helps build your habit.</li>
+          <li>Update your progress regularly to see your reading journey.</li>
+          <li>Don't worry about being perfect - just be consistent!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Sync range slider with hidden input
+document.getElementById('progressRange').addEventListener('input', function() {
+  document.getElementById('{{ form.progress.id_for_label }}').value = this.value;
+  document.getElementById('progressValue').innerText = this.value + '%';
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const range = document.getElementById('progressRange');
+  const input = document.getElementById('{{ form.progress.id_for_label }}');
+  if (input && input.value) {
+    range.value = input.value;
+    document.getElementById('progressValue').innerText = input.value + '%';
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>📊 My Reading Achievements</h2>
+
+  <!-- Reading Streak Section -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">🔥 Reading Streak</h5>
+        </div>
+        <div class="card-body text-center">
+          <h1 class="display-4 text-primary">{{ current_streak }}</h1>
+          <p class="mb-1">Current streak</p>
+          <small class="text-muted">Longest: {{ longest_streak }} days</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card border-success">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">📚 Books Completed</h5>
+        </div>
+        <div class="card-body text-center">
+          <h1 class="display-4 text-success">{{ total_books_read }}</h1>
+          <p class="mb-0">Books finished</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reading Stats -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3 class="text-info">{{ total_days }}</h3>
+          <p class="mb-0">Days reading</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-center">
+          <h3 class="text-warning">{{ total_minutes }}</h3>
+          <p class="mb-0">Minutes read</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-body text-secondary">
+          <h3>{{ total_books }}</h3>
+          <p class="mb-0">Books started</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestones -->
+  {% if milestones %}
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">🏆 Your Achievements</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        {% for milestone in milestones %}
+        <div class="col-md-6 mb-2">
+          <div class="alert alert-success py-2 mb-0">
+            {{ milestone }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Encouragement -->
+  <div class="text-center">
+    {% if current_streak == 0 %}
+    <p class="text-muted">Start reading today to begin your streak! 📖</p>
+    {% elif current_streak < 7 %}
+    <p class="text-success">Keep it up! You're building a great habit. 💪</p>
+    {% else %}
+    <p class="text-primary">Amazing dedication! You're a reading champion! 🏆</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "email/base.html" %}
+{% load static %}
+
+{% block subject %}🚨 URGENT: {{ transaction.book.title }} is 7 days overdue{% endblock %}
+
+{% block content %}
+<h2>🚨 Urgent: Book Overdue Escalation</h2>
+
+<p>Hi {{ transaction.user.get_full_name|default:transaction.user.username }},</p>
+
+<div class="highlight" style="border-left-color: #dc3545; background-color: #f8d7da;">
+    <h3 style="color: #721c24;">⚠️ This is an urgent escalation notice</h3>
+    <p><strong>{{ transaction.book.title }}</strong> has been overdue for 7 days. Immediate action is required to avoid suspension of borrowing privileges.</p>
+</div>
+
+<div class="book-card" style="border-left: 4px solid #dc3545;">
+    <div style="display: flex; align-items: center;">
+        {% if transaction.book.cover_image %}
+        <img src="{{ transaction.book.cover_image.url }}" alt="{{ transaction.book.title }}" style="width: 80px; height: 120px; object-fit: cover; margin-right: 15px; border-radius: 5px;">
+        {% endif %}
+        <div>
+            <div class="book-title">{{ transaction.book.title }}</div>
+            <div class="book-author">by {{ transaction.book.author }}</div>
+            <p><strong>Due Date:</strong> {{ transaction.due_date|date:"l, F j, Y" }}</p>
+            <p><strong>Days Overdue:</strong> <span style="color: #dc3545; font-weight: bold;">7+ days</span></p>
+        </div>
+    </div>
+</div>
+
+<h3>💰 Accumulated Late Fees</h3>
+<div class="highlight" style="border-left-color: #ffc107; background-color: #fff3cd;">
+    <p>Late returns accumulate daily fees. Please return the book immediately to minimize additional charges.</p>
+</div>
+
+<h3>🔄 Return Options</h3>
+<div style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div style="text-align: center;">
+        <p><strong>📱 Quick Return</strong></p>
+        {% if transaction.book.qr_code %}
+        <img src="{{ transaction.book.qr_code.url }}" alt="QR Code" style="width: 80px; height: 80px;">
+        <p>Scan QR code at return station</p>
+        {% else %}
+        <p>QR code will be generated soon</p>
+        {% endif %}
+    </div>
+    <div style="text-align: center;">
+        <p><strong>💻 Online Return</strong></p>
+        <p>Use the return button in your dashboard</p>
+    </div>
+    <div style="text-align: center;">
+        <p><strong>🏛️ In Person</strong></p>
+        <p>Return to the library during open hours</p>
+    </div>
+</div>
+
+<h3>⚖️ Account Status</h3>
+<div class="highlight" style="border-left-color: #6c757d; background-color: #f8f9fa;">
+    <h4 style="color: #495057;">Borrowing Privileges</h4>
+    <p>Continued overdue status may result in:</p>
+    <ul>
+        <li>Temporary suspension of borrowing privileges</li>
+        <li>Additional late fees</li>
+        <li>Impact on account standing</li>
+    </ul>
+</div>
+
+<h3>📞 Contact Information</h3>
+<p>Please contact us immediately to discuss your account status:</p>
+<ul>
+    <li>Visit the library administration office</li>
+    <li>Contact the library administrator directly</li>
+    <li>Check your account status in the dashboard</li>
+</ul>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{% url 'transactions:transaction_list' %}" class="button" style="background: #dc3545;">Return Book Now</a>
+    <a href="{% url 'users:settings' %}" class="button" style="background: #6c757d; margin-left: 10px;">Contact Admin</a>
+</div>
+
+<p>This is your final notice before account restrictions may be applied. We appreciate your immediate attention to this matter.</p>
+
+<p>Thank you for your cooperation in maintaining our shared library resources.</p>
+
+<p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this email because you have a severely overdue book that requires immediate attention.</p>
+<p>
+    <a href="{% url 'transactions:transaction_list' %}">View Overdue Books</a> |
+    <a href="{% url 'users:settings' %}">Email Preferences</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

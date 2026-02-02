@@ -1,0 +1,65 @@
+{% extends "email/base.html" %}
+{% load static %}
+{% load notification_filters %}
+
+{% block subject %}Welcome to Book Club - Your Reading Journey Begins!{% endblock %}
+
+{% block content %}
+<h2>Welcome to Book Club, {{ user.get_full_name|default:user.username }}! 🎉</h2>
+
+<p>We're thrilled to have you join our community of book lovers! Your reading adventure starts now.</p>
+
+<div class="highlight">
+    <h3>🚀 Quick Start Guide</h3>
+    <p><strong>1. Explore Books:</strong> Browse our collection and discover your next favorite read</p>
+    <p><strong>2. Make Requests:</strong> Can't find what you're looking for? Submit a book request</p>
+    <p><strong>3. Track Reading:</strong> Log your reading progress and earn achievements</p>
+    <p><strong>4. Join Discussions:</strong> Connect with fellow readers in our community</p>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{% trackable_url campaign_id '/books/' %}" class="button">Browse Books</a>
+    <a href="{% trackable_url campaign_id '/dashboard/' %}" class="button" style="background: #28a745; margin-left: 10px;">View Dashboard</a>
+</div>
+
+<h3>📚 What's Available Right Now</h3>
+<p>Check out some of our most popular books currently available:</p>
+{% for book in sample_books %}
+<div class="book-card">
+    <div class="book-title"><a href="{% trackable_url campaign_id book.get_absolute_url %}">{{ book.title }}</a></div>
+    <div class="book-author">by {{ book.author }}</div>
+    <p>{{ book.description|truncatechars:100 }}</p>
+</div>
+{% endfor %}
+
+<h3>🎯 Set Your Reading Goals</h3>
+<p>Ready to start reading? Set personal goals and track your progress:</p>
+<ul>
+    <li>Monthly reading targets</li>
+    <li>Genre exploration challenges</li>
+    <li>Reading streak achievements</li>
+    <li>Community leaderboards</li>
+</ul>
+
+<p>We'll send you personalized recommendations and progress updates to keep you motivated!</p>
+
+<h3>📞 Need Help?</h3>
+<p>Have questions? We're here to help!</p>
+<ul>
+    <li>Visit our <a href="{% trackable_url campaign_id '/docs/USAGE.md' %}">User Guide</a></li>
+    <li>Contact support at <a href="mailto:support@bookclub.com">support@bookclub.com</a></li>
+    <li>Join our community discussions</li>
+</ul>
+
+<p>Happy reading! 📖</p>
+<p>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this welcome email as a new member of our Book Club.</p>
+<p>
+    <a href="{% trackable_url campaign_id preferences_url %}">Update Preferences</a> |
+    <a href="{% trackable_url campaign_id unsubscribe_url %}">Unsubscribe</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<main role="main">
+    <!-- Hero Section -->
+    <section class="hero-banner" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 20px;">
+        <div class="hero-content" style="max-width: 800px; margin: 0 auto; text-align: center;">
+            <h1 style="font-size: 48px; margin-bottom: 20px;">
+                📚 Welcome to Your Community Book Club
+            </h1>
+            <p style="font-size: 20px; line-height: 1.6; margin-bottom: 40px;">
+                Discover new books, track your reading journey, and connect with fellow book lovers. 
+                Join thousands of readers sharing their passion for literature.
+            </p>
+            
+            <!-- Primary CTA -->
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <a href="{% url 'users:register' %}" class="btn btn-primary btn-large" style="padding: 15px 40px; font-size: 18px; background-color: #ff6b6b; border-radius: 8px; text-decoration: none; color: white; font-weight: 600; cursor: pointer; transition: background-color 0.3s;">
+                    🚀 Get Started Free
+                </a>
+                <a href="{% url 'books:book_list' %}" class="btn btn-secondary btn-large" style="padding: 15px 40px; font-size: 18px; background-color: transparent; border: 2px solid white; border-radius: 8px; text-decoration: none; color: white; font-weight: 600; cursor: pointer;">
+                    📖 Browse Books
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Announcements Section -->
+    {% if announcements %}
+    <section style="padding: 40px 20px; background: #fff;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h2 style="text-align: center; font-size: 30px; margin-bottom: 30px;">
+                📢 Latest Announcements
+            </h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                {% for announcement in announcements %}
+                <div class="card" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+                    <div class="card-body" style="padding: 20px;">
+                        <h3 style="font-size: 20px; margin-bottom: 10px; color: #333;">{{ announcement.title }}</h3>
+                        <p style="font-size: 14px; color: #666; line-height: 1.5;">{{ announcement.content|truncatechars:150 }}</p>
+                        <small style="color: #999;">Published: {{ announcement.pub_date|date:"F d, Y" }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if announcements|length == 3 %}
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="{% url 'notifications:announcement_list' %}" class="btn btn-outline-primary" style="padding: 10px 25px; border-radius: 5px; text-decoration: none; color: #667eea; border: 1px solid #667eea;">View All Announcements</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Features Section -->
+    <section style="padding: 80px 20px; background: white;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h2 style="text-align: center; font-size: 36px; margin-bottom: 60px;">
+                Why Join Our Book Club?
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;">
+                <div class="feature-card" style="text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">📚</div>
+                    <h3 style="font-size: 20px; margin-bottom: 10px;">Vast Library</h3>
+                    <p style="color: #666; line-height: 1.6;">
+                        Access hundreds of books across all genres and interests
+                    </p>
+                </div>
+                
+                <div class="feature-card" style="text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">📊</div>
+                    <h3 style="font-size: 20px; margin-bottom: 10px;">Track Progress</h3>
+                    <p style="color: #666; line-height: 1.6;">
+                        Log your reading journey and watch your stats grow
+                    </p>
+                </div>
+                
+                <div class="feature-card" style="text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">👥</div>
+                    <h3 style="font-size: 20px; margin-bottom: 10px;">Community</h3>
+                    <p style="color: #666; line-height: 1.6;">
+                        Connect, discuss, and share with passionate readers
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section style="padding: 60px 20px; background: #f8f9ff;">
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <h3 style="font-size: 24px; margin-bottom: 30px;">Trusted by Book Lovers Worldwide</h3>
+            <div style="display: flex; justify-content: center; gap: 60px; flex-wrap: wrap;">
+                <div>
+                    <div style="font-size: 32px; font-weight: bold; color: #667eea;">5,000+</div>
+                    <p style="color: #666;">Active Members</p>
+                </div>
+                <div>
+                    <div style="font-size: 32px; font-weight: bold; color: #667eea;">15,000+</div>
+                    <p style="color: #666;">Books Available</p>
+                </div>
+                <div>
+                    <div style="font-size: 32px; font-weight: bold; color: #667eea;">50,000+</div>
+                    <p style="color: #666;">Books Borrowed</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

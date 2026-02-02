@@ -1,0 +1,35 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}🎉 Congratulations on Your {{ streak_days }}-Day Reading Streak!{% endblock %}
+
+{% block header %}Reading Streak Achieved!{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+    <p>We're thrilled to celebrate your incredible dedication! You've officially achieved a <strong>{{ streak_days }}-day reading streak!</strong></p>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <img src="https://via.placeholder.com/100x100?text=Streak" alt="Reading Streak Badge" style="width: 100px; height: 100px; object-fit: cover;">
+        <p style="font-size: 18px; font-weight: bold; color: #28a745; margin-top: 10px;">Keep it up!</p>
+    </div>
+
+    <p>Every day you read, you're building a powerful habit and expanding your knowledge. We're proud to have you as part of our reading community.</p>
+
+    <h4>📚 Keep the Momentum Going!</h4>
+    <ul>
+        <li>Log your daily reading in your dashboard to maintain your streak.</li>
+        <li>Discover new books that match your interests.</li>
+        <li>Join a reading challenge to push your limits.</li>
+    </ul>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="/dashboard/" class="button">View My Dashboard</a>
+        <a href="/books/" class="button" style="background: #28a745; margin-left: 10px;">Find New Books</a>
+    </div>
+
+    <p>Happy Reading!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

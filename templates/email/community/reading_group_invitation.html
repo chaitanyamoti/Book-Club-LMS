@@ -1,0 +1,36 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}👥 You're Invited to Join the Reading Group: {{ group.name }}!{% endblock %}
+
+{% block header %}Reading Group Invitation{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+    <p>You've been invited to join an exciting new reading group:</p>
+
+    <h3 style="color: #007bff;">{{ group.name }}</h3>
+    <p>{{ group.description|linebreaksbr }}</p>
+
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h4>Group Details:</h4>
+        <p><strong>Admin:</strong> {{ group.admin.get_full_name|default:group.admin.username }}</p>
+        {% if group.current_book %}
+            <p><strong>Currently Reading:</strong> {{ group.current_book.title }} by {{ group.current_book.author }}</p>
+        {% endif %}
+        {% if group.meeting_details %}
+            <p><strong>Meeting Details:</strong> {{ group.meeting_details }}</p>
+        {% endif %}
+    </div>
+
+    <p>Connect with fellow book lovers, discuss your favorite reads, and explore new literary worlds together!</p>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ site_url }}{% url 'reading:group_detail' group.id %}" class="button">View Group & Join!</a>
+    </div>
+
+    <p>We hope to see you there!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

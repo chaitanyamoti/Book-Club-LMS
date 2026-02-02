@@ -1,0 +1,40 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}Reading Challenge Update: {{ challenge.name }}{% endblock %}
+
+{% block header %}Reading Challenge Progress{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+    <p>Here's an update on your progress in the <strong>"{{ challenge.name }}"</strong> reading challenge:</p>
+
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h4 style="color: #007bff;">Your Current Progress:</h4>
+        <p>You have read <strong>{{ user_challenge.progress_books }} out of {{ challenge.goal_value }} books</strong>.</p>
+        <p>You have read <strong>{{ user_challenge.progress_pages }} pages</strong>.</p>
+        
+        {% if user_challenge.is_completed %}
+            <p style="font-size: 18px; font-weight: bold; color: #28a745; text-align: center;">🎉 Congratulations! You've completed the challenge!</p>
+        {% else %}
+            <p style="font-size: 16px; color: #666; text-align: center;">Keep up the great work!</p>
+        {% endif %}
+    </div>
+
+    <h4>📚 Need a Boost?</h4>
+    <ul>
+        <li>Log your latest reads in your dashboard.</li>
+        <li>Browse recommended books that fit the challenge criteria.</li>
+        <li>Connect with other participants to share your progress and get motivated.</li>
+    </ul>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ site_url }}{% url 'reading:challenge_detail' challenge.id %}" class="button">View Challenge Details</a>
+        <a href="{{ site_url }}/reading/add/" class="button" style="background: #28a745; margin-left: 10px;">Log More Reading</a>
+    </div>
+
+    <p>We're cheering you on!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

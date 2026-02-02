@@ -1,0 +1,342 @@
+{% extends 'base_dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}My Profile{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-lg py-4">
+  <!-- Page Header -->
+  <div class="mb-4">
+    <h1 class="h2">My Profile</h1>
+    <p class="text-muted">Manage your account and preferences</p>
+  </div>
+  
+  <!-- Tabs for sections -->
+  <ul class="nav nav-tabs mb-4" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+        <i class="bi bi-person"></i> Personal Info
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
+        <i class="bi bi-shield-lock"></i> Security
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email" type="button" role="tab" aria-controls="email" aria-selected="false">
+        <i class="bi bi-envelope"></i> Email & Notifications
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="privacy-tab" data-bs-toggle="tab" data-bs-target="#privacy" type="button" role="tab" aria-controls="privacy" aria-selected="false">
+        <i class="bi bi-gear"></i> Preferences & Privacy
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="statistics-tab" data-bs-toggle="tab" data-bs-target="#statistics" type="button" role="tab" aria-controls="statistics" aria-selected="false">
+        <i class="bi bi-graph-up"></i> Statistics
+      </a>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="profileTabsContent">
+    <!-- Personal Info Tab -->
+    <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Profile Picture</h5>
+            </div>
+            <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+              {% if user.userprofile.avatar %}
+                <img src="{{ user.userprofile.avatar.url }}" alt="Avatar" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #eee;">
+              {% else %}
+                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px; font-size: 3rem;">
+                  {{ user.first_name|first|default:user.username|first|upper }}
+                </div>
+              {% endif %}
+              <div class="mt-2">
+                <a href="{% url 'users:avatar_upload' %}" class="btn btn-sm btn-outline-primary me-2">
+                  <i class="bi bi-upload"></i> Upload New
+                </a>
+                {% if user.userprofile.avatar %}
+                  <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAvatar()">
+                    <i class="bi bi-trash"></i> Remove
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Personal Information</h5>
+            </div>
+            <div class="card-body">
+              <form method="post">
+                {% csrf_token %}
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}<div class="text-danger small">{{ form.first_name.errors }}</div>{% endif %}
+                  </div>
+                  <div class="col-md-6">
+                    <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}<div class="text-danger small">{{ form.last_name.errors }}</div>{% endif %}
+                  </div>
+                  <div class="col-12">
+                    <label for="{{ form.bio.id_for_label }}" class="form-label">{{ form.bio.label }}</label>
+                    {{ form.bio }}
+                    {% if form.bio.errors %}<div class="text-danger small">{{ form.bio.errors }}</div>{% endif %}
+                  </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h6 class="mb-3 text-muted">Account Details</h6>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold">Role</label>
+                    <input type="text" class="form-control" value="{{ user.userprofile.get_role_display }}" readonly>
+                    <div class="form-text">Role changes must be requested from an administrator.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-bold">Member Since</label>
+                    <input type="text" class="form-control" value="{{ user.date_joined|date:'M d, Y' }}" readonly>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Tab -->
+    <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Password Management</h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <p class="text-muted small mb-3">
+                Last changed: {{ user.userprofile.last_password_change|default:"Never"|date:"M d, Y" }}
+              </p>
+              <a href="{% url 'users:password_change' %}" class="btn btn-primary mt-auto">
+                <i class="bi bi-key"></i> Change Password
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Two-Factor Authentication</h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex align-items-center mb-3">
+                <span class="badge bg-{% if user.userprofile.two_factor_enabled %}success{% else %}warning{% endif %} me-2">
+                  {% if user.userprofile.two_factor_enabled %}ENABLED{% else %}DISABLED{% endif %}
+                </span>
+                {% if user.userprofile.two_factor_enabled %}
+                  <small class="text-muted">Google Authenticator</small>
+                {% endif %}
+              </div>
+              {% if not user.userprofile.two_factor_enabled %}
+                <button class="btn btn-success mt-auto" disabled>
+                  <i class="bi bi-phone"></i> Enable 2FA (Coming Soon)
+                </button>
+              {% else %}
+                <button class="btn btn-warning mt-auto" disabled>
+                  <i class="bi bi-x-circle"></i> Disable 2FA (Coming Soon)
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-12">
+          <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Active Sessions</h5>
+            </div>
+            <div class="card-body">
+              <a href="{% url 'users:session_management' %}" class="btn btn-outline-info">
+                <i class="bi bi-laptop"></i> Manage Sessions
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Email & Notifications Tab -->
+    <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Email Management</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <strong>Current Email:</strong> {{ user.email }}
+                <span class="badge bg-success ms-2"><i class="bi bi-check-circle"></i> Verified</span>
+              </div>
+              <a href="{% url 'users:email_change' %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Change Email
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Notification Preferences</h5>
+            </div>
+            <div class="card-body d-flex flex-column justify-content-center">
+              <p class="text-muted small">Control what notifications you receive.</p>
+              <a href="{% url 'users:notification_preferences' %}" class="btn btn-outline-secondary mt-auto">
+                <i class="bi bi-bell"></i> Manage Preferences
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences & Privacy Tab -->
+    <div class="tab-pane fade" id="privacy" role="tabpanel" aria-labelledby="privacy-tab">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Account Activity</h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <p class="text-muted small">View your login and activity history.</p>
+              <a href="{% url 'users:audit_log' %}" class="btn btn-outline-info mt-auto">
+                <i class="bi bi-clock-history"></i> View Activity Log
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card h-100 shadow-sm border-danger border-2">
+            <div class="card-header bg-danger text-white border-bottom border-danger">
+              <h5 class="card-title mb-0">
+                <i class="bi bi-exclamation-triangle"></i> Danger Zone
+              </h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+              <p class="text-muted small mb-3">
+                Permanently delete your account and all associated data. This action cannot be undone.
+              </p>
+              <a href="{% url 'users:account_deletion' %}" class="btn btn-danger mt-auto">
+                <i class="bi bi-trash"></i> Delete Account
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Tab -->
+    <div class="tab-pane fade" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Reading Progress</h5>
+            </div>
+            <div class="card-body">
+              <div class="row text-center">
+                <div class="col-6 mb-3">
+                  <div class="display-5 fw-bold text-primary">{{ user.userprofile.streak_days }}</div>
+                  <p class="text-muted mb-0">Current Streak (Days)</p>
+                </div>
+                <div class="col-6 mb-3">
+                  <div class="display-5 fw-bold text-success">{{ user.userprofile.longest_streak }}</div>
+                  <p class="text-muted mb-0">Longest Streak (Days)</p>
+                </div>
+                <div class="col-12">
+                  <div class="display-5 fw-bold text-info">{{ user.userprofile.total_books_read }}</div>
+                  <p class="text-muted mb-0">Total Books Read</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="card-title mb-0">Account Snapshot</h5>
+            </div>
+            <div class="card-body">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong>Username:</strong>
+                  <span>{{ user.username }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong>Email:</strong>
+                  <span>{{ user.email }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong>Role:</strong>
+                  <span class="badge bg-secondary">{{ user.userprofile.get_role_display }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong>Member Since:</strong>
+                  <span>{{ user.date_joined|date:"M d, Y" }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong>Last Login:</strong>
+                  <span>{{ user.last_login|default:"Never"|date:"M d, Y" }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <strong>Account Status:</strong>
+                  <span class="badge bg-{% if user.userprofile.is_active %}success{% else %}danger{% endif %}">
+                    {% if user.userprofile.is_active %}Active{% else %}Inactive{% endif %}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function removeAvatar() {
+    if (confirm('Are you sure you want to remove your avatar?')) {
+        // Placeholder for actual avatar removal logic
+        alert('Avatar removal functionality needs backend implementation.');
+        // In a real application, you would make an AJAX call here
+        // fetch('/users/remove_avatar/', { method: 'POST', headers: { 'X-CSRFToken': '{{ csrf_token }}' } })
+        // .then(response => response.json())
+        // .then(data => {
+        //     if (data.success) {
+        //         window.location.reload();
+        //     } else {
+        //         alert('Error removing avatar: ' + data.error);
+        //     }
+        // });
+    }
+}
+</script>
+{% endblock %}

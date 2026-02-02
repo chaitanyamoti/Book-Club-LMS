@@ -1,0 +1,270 @@
+import os
+from pathlib import Path
+from datetime import timedelta
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ✅ LOAD .env FIRST
+if (BASE_DIR / '.env').exists():
+    try:
+        from dotenv import load_dotenv
+        result = load_dotenv(BASE_DIR / '.env')
+        print(f"DEBUG: .env file exists at {BASE_DIR / '.env'}")
+        print(f"DEBUG: load_dotenv result: {result}")
+    except ImportError:
+        print("WARNING: python-dotenv is not installed. Environment variables not loaded from .env file.")
+    except Exception as e:
+        print(f"WARNING: An error occurred while loading .env file: {e}")
+else:
+    print(f"DEBUG: .env file does not exist at {BASE_DIR / '.env'}")
+
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-production')
+
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',') if os.environ.get('ALLOWED_HOSTS') else ['*']  # For development, change for production
+
+INSTALLED_APPS = [
+    'jazzmin',  # MUST BE FIRST
+
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Third party
+    'crispy_forms',
+    'crispy_bootstrap5',
+    'import_export',
+
+    # Our apps
+    'core',
+    'users',
+    'books',
+    'transactions',
+    'reading',
+    'bookrequests',
+    'notifications',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'bookclub.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'core.context_processors.club_settings',
+                'notifications.context_processors.notifications_context',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'bookclub.wsgi.application'
+
+# DATABASE - SQLite for dev, PostgreSQL for production
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# For PythonAnywhere (uncomment for production)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.environ.get('DB_NAME', 'bookclub_db'),
+#         'USER': os.environ.get('DB_USER', 'bookclub_user'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+#         'HOST': os.environ.get('DB_HOST', 'localhost'),
+#         'PORT': os.environ.get('DB_PORT', '5432'),
+#     }
+# }
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# LOGIN/LOGOUT URLs
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
+
+# CRISPY FORMS
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# =========================
+# EMAIL CONFIG (SINGLE SOURCE OF TRUTH)
+# =========================
+
+# EMAIL_BACKEND_TYPE = os.environ.get("EMAIL_BACKEND_TYPE", "console").lower()
+
+# DEFAULT_FROM_EMAIL = os.environ.get(
+#     "DEFAULT_FROM_EMAIL",
+#     "Book Club <noreply@bookclub.local>"
+# )
+
+# if EMAIL_BACKEND_TYPE == "smtp":
+#     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+#     EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+#     EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+#     EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+#     EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+#     EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+# elif EMAIL_BACKEND_TYPE == "file":
+#     EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+#     EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
+
+# else:
+#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL CONFIGURATION
+# For development, use console backend (emails printed to console)
+# For production, set EMAIL_BACKEND_TYPE=smtp in environment variables with credentials
+EMAIL_BACKEND_TYPE = os.environ.get("EMAIL_BACKEND_TYPE", "console").lower()
+
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL",
+    "Book Club <noreply@bookclub.local>"
+)
+
+if EMAIL_BACKEND_TYPE == "smtp":
+    # Only use SMTP if credentials are provided
+    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+
+    if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+        EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+        EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+        EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+        EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
+        print("DEBUG: Using SMTP backend with credentials")
+    else:
+        print("WARNING: EMAIL_BACKEND_TYPE=smtp but no EMAIL_HOST_USER/EMAIL_HOST_PASSWORD found. Falling back to console backend.")
+        EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+elif EMAIL_BACKEND_TYPE == "file":
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
+
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# JAZZMIN SETTINGS (Modern Admin Theme)
+JAZZMIN_SETTINGS = {
+    "site_title": "Book Club Admin",
+    "site_header": "Book Club",
+    "site_brand": "📚 Book Club",
+    "site_logo": "images/logo.png",
+    "welcome_sign": "Welcome to Book Club Admin Panel",
+    "copyright": "Book Club Manager",
+            "search_model": ["auth.User", "core.Book"],    "user_avatar": None,
+    "topmenu_links": [
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Home", "url": "core:home", "new_window": False},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": ["auth", "core", "transactions", "reading", "bookrequests", "notifications", "users"],
+    "apps": {
+        "core": {
+            "icon": "fas fa-book",
+            "name": "Library Management",
+        },
+        "transactions": {
+            "icon": "fas fa-exchange-alt",
+            "name": "Book Transactions",
+        },
+        "reading": {
+            "icon": "fas fa-book-reader",
+            "name": "Reading Activities",
+        },
+        "bookrequests": {
+            "icon": "fas fa-hand-paper",
+            "name": "Book Requests",
+        },
+        "notifications": {
+            "icon": "fas fa-bell",
+            "name": "Notifications",
+        },
+        "users": {
+            "icon": "fas fa-users",
+            "name": "User Management",
+        },
+    },
+    "icons": {
+        "auth.User": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "core.Book": "fas fa-book",
+        "core.Transaction": "fas fa-exchange-alt",
+        "core.ReadingLog": "fas fa-calendar-check",
+        "core.BookRequest": "fas fa-hand-paper",
+        "core.UserProfile": "fas fa-id-card",
+        "core.ClubSettings": "fas fa-cogs",
+        "transactions.Transaction": "fas fa-exchange-alt",
+        "reading.ReadingLog": "fas fa-calendar-check",
+        "reading.ReadingChallenge": "fas fa-trophy",
+        "reading.UserReadingChallenge": "fas fa-user-trophy",
+        "reading.ReadingGroup": "fas fa-users",
+        "reading.GroupMembership": "fas fa-user-plus",
+        "bookrequests.BookRequest": "fas fa-hand-paper",
+        "notifications.Announcement": "fas fa-bullhorn",
+        "notifications.UserNotification": "fas fa-bell",
+        "notifications.EmailPreference": "fas fa-envelope",
+        "notifications.EmailLog": "fas fa-mail-bulk",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "related_modal_active": True,
+    "custom_css": None,
+    "custom_js": None,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},
+}
+print("EMAIL_BACKEND_TYPE =", os.environ.get("EMAIL_BACKEND_TYPE"))
+print("EMAIL_BACKEND =", EMAIL_BACKEND)

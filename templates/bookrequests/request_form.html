@@ -1,0 +1,163 @@
+{% extends 'base_dashboard.html' %}
+{% block dashboard_content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📚 Request a Book</h4>
+                    <small>Can't find what you're looking for? Let us know!</small>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="bookRequestForm">
+                        {% csrf_token %}
+
+                        <!-- Request Type Selection -->
+                        <div class="mb-4">
+                            <h5>What would you like to do?</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="request_type" id="waitlist" value="WAITLIST" checked>
+                                        <label class="form-check-label" for="waitlist">
+                                            <strong>📖 Join Waitlist</strong><br>
+                                            <small class="text-muted">Request a book that's currently checked out</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="request_type" id="purchase" value="PURCHASE">
+                                        <label class="form-check-label" for="purchase">
+                                            <strong>🛒 Suggest Purchase</strong><br>
+                                            <small class="text-muted">Recommend a new book for our collection</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Waitlist Section -->
+                        <div id="waitlistSection" class="request-section">
+                            <div class="mb-3">
+                                <label for="{{ form.book.id_for_label }}" class="form-label">📚 Which book would you like?</label>
+                                {{ form.book }}
+                                {% if form.book.errors %}
+                                    <div class="text-danger small">{{ form.book.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">Choose from books that are currently unavailable</small>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Section -->
+                        <div id="purchaseSection" class="request-section d-none">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.title.id_for_label }}" class="form-label">📖 Book Title</label>
+                                    {{ form.title }}
+                                    {% if form.title.errors %}
+                                        <div class="text-danger small">{{ form.title.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.author.id_for_label }}" class="form-label">✍️ Author</label>
+                                    {{ form.author }}
+                                    {% if form.author.errors %}
+                                        <div class="text-danger small">{{ form.author.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reason -->
+                        <div class="mb-3">
+                            <label for="{{ form.reason.id_for_label }}" class="form-label">💭 Why do you want this book?</label>
+                            {{ form.reason }}
+                            {% if form.reason.errors %}
+                                <div class="text-danger small">{{ form.reason.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Help us understand your interest (optional but appreciated!)</small>
+                        </div>
+
+                        <!-- Hidden request_type field for form processing -->
+                        {{ form.request_type }}
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                🚀 Submit My Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Text -->
+            <div class="alert alert-info mt-3">
+                <h6><i class="bi bi-info-circle-fill"></i> How it works:</h6>
+                <ul class="mb-0 small">
+                    <li><strong>Join Waitlist:</strong> Get notified when a popular book becomes available</li>
+                    <li><strong>Suggest Purchase:</strong> Help us grow our collection with your recommendations</li>
+                    <li>We'll review your request and get back to you soon!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const waitlistRadio = document.getElementById('waitlist');
+    const purchaseRadio = document.getElementById('purchase');
+    const waitlistSection = document.getElementById('waitlistSection');
+    const purchaseSection = document.getElementById('purchaseSection');
+    const bookSelect = document.getElementById('{{ form.book.auto_id }}');
+    const titleInput = document.getElementById('{{ form.title.auto_id }}');
+    const authorInput = document.getElementById('{{ form.author.auto_id }}');
+    const requestTypeInput = document.getElementById('{{ form.request_type.auto_id }}');
+
+    // Function to toggle sections
+    function toggleSections() {
+        if (waitlistRadio.checked) {
+            waitlistSection.classList.remove('d-none');
+            purchaseSection.classList.add('d-none');
+            bookSelect.required = true;
+            titleInput.required = false;
+            authorInput.required = false;
+            requestTypeInput.value = 'WAITLIST';
+        } else {
+            waitlistSection.classList.add('d-none');
+            purchaseSection.classList.remove('d-none');
+            bookSelect.required = false;
+            titleInput.required = true;
+            authorInput.required = true;
+            requestTypeInput.value = 'PURCHASE';
+        }
+    }
+
+    // Function to populate book fields (for waitlist)
+    function populateBookFields() {
+        // Only populate if we have book data
+        const selectedBookId = bookSelect.value;
+        if (selectedBookId && window.bookData) {
+            const book = window.bookData.find(b => b.id == selectedBookId);
+            if (book) {
+                titleInput.value = book.title;
+                authorInput.value = book.author;
+            }
+        }
+    }
+
+    // Add event listeners
+    waitlistRadio.addEventListener('change', toggleSections);
+    purchaseRadio.addEventListener('change', toggleSections);
+    bookSelect.addEventListener('change', populateBookFields);
+
+    // Initialize
+    toggleSections();
+
+    // Add book data to window for easy access
+    window.bookData = {{ books_json|safe }};
+});
+</script>
+{% endblock %}

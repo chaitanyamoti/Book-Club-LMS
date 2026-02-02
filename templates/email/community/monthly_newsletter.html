@@ -1,0 +1,63 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}📚 Your Monthly Book Club Newsletter - {{ month_name }} {{ year }}{% endblock %}
+
+{% block header %}Monthly Book Club Newsletter{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+    <p>Welcome to your monthly dose of Book Club updates! Here's what's been happening and what's coming up in {{ month_name }} {{ year }}:</p>
+
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h4 style="color: #007bff;">🌟 Member Spotlight</h4>
+        {% if spotlight_member %}
+            <p>This month, we shine a light on <strong>{{ spotlight_member.user.get_full_name|default:spotlight_member.user.username }}</strong>! {{ spotlight_member.user.get_full_name|default:spotlight_member.user.username }} has read {{ spotlight_member.total_books_read }} books and has a longest streak of {{ spotlight_member.longest_streak }} days. Keep up the amazing work!</p>
+            {% if spotlight_member.avatar %}
+                <div style="text-align: center; margin-top: 10px;">
+                    <img src="{{ site_url }}{{ spotlight_member.avatar.url }}" alt="Member Avatar" style="max-width: 80px; height: 80px; border-radius: 50%;">
+                </div>
+            {% endif %}
+        {% else %}
+            <p>No member spotlight this month, but stay tuned! You could be next!</p>
+        {% endif %}
+    </div>
+
+    {% if top_books %}
+        <div style="padding: 20px; margin: 20px 0;">
+            <h4 style="color: #28a745;">📈 Top Books This Month</h4>
+            <ul style="list-style-type: none; padding: 0;">
+                {% for book in top_books %}
+                    <li style="margin-bottom: 10px;">
+                        <strong>{{ book.title }}</strong> by {{ book.author }} ({{ book.issue_count }} issues)
+                        <br><small>{{ book.description|truncatechars:100 }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if upcoming_events %}
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h4 style="color: #dc3545;">📢 Upcoming Events & Challenges</h4>
+            <ul style="list-style-type: none; padding: 0;">
+                {% for event in upcoming_events %}
+                    <li style="margin-bottom: 10px;">
+                        <strong>{{ event.name }}</strong> ({{ event.date|date:"F j, Y" }})
+                        <br>{{ event.description|truncatechars:100 }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ site_url }}/dashboard/" class="button">Visit Your Dashboard</a>
+        <a href="{{ site_url }}/books/" class="button" style="background: #28a745; margin-left: 10px;">Browse Our Collection</a>
+    </div>
+
+    <p>Thank you for being a valued member of our Book Club!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

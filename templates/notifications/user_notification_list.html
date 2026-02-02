@@ -1,0 +1,48 @@
+{% extends 'base_dashboard.html' %}
+
+{% block page_title %}My Notifications{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Your Notifications</h5>
+            </div>
+            {% if user_notifications %}
+                <div class="list-group list-group-flush">
+                    {% for notification in user_notifications %}
+                        <a href="{{ notification.link_url|default:'#' }}" class="list-group-item list-group-item-action {% if not notification.is_read %}list-group-item-light fw-bold{% endif %}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">
+                                    {% if notification.type == 'OVERDUE' %}
+                                        🚨 Overdue Reminder
+                                    {% elif notification.type == 'WARNING' %}
+                                        ⚠️ Warning
+                                    {% elif notification.type == 'ALERT' %}
+                                        ❗ Alert
+                                    {% elif notification.type == 'NEW_BOOK' %}
+                                        📚 New Book Available
+                                    {% else %}
+                                        ℹ️ Information
+                                    {% endif %}
+                                    {{ notification.message|truncatechars:100 }}
+                                </h6>
+                                <small class="text-muted">{{ notification.created_at|timesince }} ago</small>
+                            </div>
+                            <p class="mb-1 text-muted">{{ notification.message }}</p>
+                            {% if notification.link_url %}
+                                <small>View details &raquo;</small>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <p class="text-muted mb-0">You have no notifications at this time.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

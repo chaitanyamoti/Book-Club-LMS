@@ -1,0 +1,32 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}Thank You for Returning "{{ transaction.book.title }}"!{% endblock %}
+
+{% block header %}Book Returned Confirmation{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+    <p>We're happy to confirm that you have successfully returned:</p>
+    <h3>{{ transaction.book.title }} by {{ transaction.book.author }}</h3>
+    <p>Returned On: {{ transaction.return_date|date:"F d, Y" }}</p>
+
+    {% if reading_stats.total_books_read %}
+        <p>You've now read {{ reading_stats.total_books_read }} books with us. Keep up the great reading!</p>
+    {% endif %}
+
+    {% if recommended_books %}
+        <h4>What to read next?</h4>
+        <p>Here are some recommendations you might enjoy:</p>
+        <ul>
+            {% for book in recommended_books %}
+                <li><a href="{{ site_url }}{% url 'books:book_detail' book.id %}">{{ book.title }} by {{ book.author }}</a></li>
+            {% endfor %}
+        </ul>
+        <p>Or browse our full collection <a href="{{ site_url }}{% url 'books:book_list' %}">here</a>!</p>
+    {% endif %}
+
+    <p>Thank you for being a part of our Book Club!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

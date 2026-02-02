@@ -1,0 +1,20 @@
+{% extends 'base_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8">
+      <h2>{{ book.title }}</h2>
+      <p><strong>Author:</strong> {{ book.author }}</p>
+      <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+      <p><strong>Status:</strong> {{ book.status }}</p>
+      <p>{{ book.description }}</p>
+    </div>
+    <div class="col-md-4">
+      {% if book.qr_code %}
+      <img src="{{ book.qr_code.url }}" alt="QR code" class="img-fluid">
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

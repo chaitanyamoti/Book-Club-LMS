@@ -1,0 +1,62 @@
+{% load static %}
+<aside class="sidebar bg-light border-end">
+  <nav class="navbar-nav flex-column p-3">
+    <!-- Branding in Sidebar -->
+    <div class="mb-4">
+      <h6 class="text-muted text-uppercase small fw-bold">Menu</h6>
+    </div>
+    
+    <!-- Navigation Items -->
+    <a href="{% url 'core:dashboard' %}" 
+       class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %} rounded">
+      <i class="bi bi-speedometer2 me-2"></i> Dashboard
+    </a>
+    
+    <a href="{% url 'books:book_list' %}" 
+       class="nav-link {% if 'books' in request.resolver_match.app_name %}active{% endif %} rounded">
+      <i class="bi bi-book me-2"></i> Browse Books
+    </a>
+    
+    <a href="{% url 'transactions:transaction_list' %}" 
+       class="nav-link {% if 'transactions' in request.resolver_match.app_name %}active{% endif %} rounded">
+      <i class="bi bi-box-seam me-2"></i> My Books
+      {% if open_transactions.count > 0 %}
+        <span class="badge bg-primary ms-auto">{{ open_transactions.count }}</span>
+      {% endif %}
+    </a>
+    
+    <a href="{% url 'reading:reading_log' %}" 
+       class="nav-link {% if 'reading' in request.resolver_match.app_name %}active{% endif %} rounded">
+      <i class="bi bi-bookmark-check me-2"></i> Reading Log
+    </a>
+    
+    <a href="{% url 'bookrequests:request_list' %}" 
+       class="nav-link {% if 'bookrequests' in request.resolver_match.app_name %}active{% endif %} rounded">
+      <i class="bi bi-hand-thumbs-up me-2"></i> Requests
+    </a>
+    
+    <!-- Secondary Navigation -->
+    <hr class="my-3">
+    
+    <a href="{% url 'notifications:inbox' %}" 
+       class="nav-link {% if 'notifications' in request.resolver_match.app_name %}active{% endif %} rounded">
+      <i class="bi bi-bell me-2"></i> Notifications
+      {% if unread_notifications_count > 0 %}
+        <span class="badge bg-danger ms-auto">{{ unread_notifications_count }}</span>
+      {% endif %}
+    </a>
+
+    {% if user.is_superuser %}
+    <a href="{% url 'admin:index' %}" 
+       class="nav-link {% if 'admin' in request.resolver_match.app_name %}active{% endif %} rounded">
+        <i class="bi bi-gear me-2"></i> Admin
+    </a>
+    {% endif %}
+    
+    <!-- Footer Section -->
+    <hr class="mt-auto pt-3">
+    <div class="small text-muted">
+      <p>© 2026 Book Club</p>
+    </div>
+  </nav>
+</aside>

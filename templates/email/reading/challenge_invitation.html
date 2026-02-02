@@ -1,0 +1,43 @@
+{% extends 'email/base.html' %}
+
+{% block subject %}🚀 Join Our New Reading Challenge: {{ challenge.name }}!{% endblock %}
+
+{% block header %}New Reading Challenge!{% endblock %}
+
+{% block content %}
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+    <p>Get ready for an exciting new reading adventure! We're thrilled to invite you to join our latest challenge:</p>
+
+    <h3 style="color: #007bff;">{{ challenge.name }}</h3>
+    <p>{{ challenge.description|linebreaksbr }}</p>
+
+    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h4>Challenge Details:</h4>
+        <p><strong>🗓️ Duration:</strong> {{ challenge.start_date|date:"F j, Y" }} - {{ challenge.end_date|date:"F j, Y" }}</p>
+        <p><strong>🎯 Goal:</strong> {{ challenge.goal_value }} {{ challenge.get_goal_type_display }}</p>
+        {% if challenge.target_genres %}
+            <p><strong>📖 Genres:</strong> {{ challenge.target_genres }}</p>
+        {% endif %}
+        {% if challenge.target_books.all %}
+            <p><strong>📚 Specific Books:</strong></p>
+            <ul>
+                {% for book in challenge.target_books.all %}
+                    <li>{{ book.title }} by {{ book.author }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <p>This is a fantastic opportunity to discover new books, challenge yourself, and connect with fellow readers.</p>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ site_url }}{% url 'reading:challenge_detail' challenge.id %}" class="button">Learn More & Join!</a>
+    </div>
+
+    <p>We can't wait to see you conquer this challenge!</p>
+    <p>Happy reading!</p>
+    <p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block tracking_pixel %}{{ site_url }}{{ tracking_pixel }}{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "email/base.html" %}
+{% load static %}
+
+{% block subject %}📅 Friendly reminder: {{ transaction.book.title }} due soon{% endblock %}
+
+{% block content %}
+<h2>📅 Gentle Reminder</h2>
+
+<p>Hi {{ transaction.user.get_full_name|default:transaction.user.username }},</p>
+
+<div class="highlight" style="border-left-color: #17a2b8; background-color: #d1ecf1;">
+    <h3 style="color: #0c5460;">Just a friendly reminder...</h3>
+    <p>Your borrowed book is due in {{ days_remaining }} days. No rush, but we wanted to give you a heads up!</p>
+</div>
+
+<div class="book-card">
+    <div style="display: flex; align-items: center;">
+        {% if transaction.book.cover_image %}
+        <img src="{{ transaction.book.cover_image.url }}" alt="{{ transaction.book.title }}" style="width: 80px; height: 120px; object-fit: cover; margin-right: 15px; border-radius: 5px;">
+        {% endif %}
+        <div>
+            <div class="book-title">{{ transaction.book.title }}</div>
+            <div class="book-author">by {{ transaction.book.author }}</div>
+            <p><strong>Due Date:</strong> {{ transaction.due_date|date:"l, F j, Y" }}</p>
+            <p><strong>Days Remaining:</strong> <span style="color: #17a2b8; font-weight: bold;">{{ days_remaining }} days</span></p>
+        </div>
+    </div>
+</div>
+
+<h3>💡 Reading Tips</h3>
+<div class="highlight" style="border-left-color: #28a745;">
+    <h4>Make the Most of Your Remaining Time</h4>
+    <ul>
+        <li><strong>Daily Reading:</strong> Try reading for just 15-20 minutes each day</li>
+        <li><strong>Track Progress:</strong> Log your reading to stay motivated</li>
+        <li><strong>Take Notes:</strong> Jot down your favorite parts or thoughts</li>
+        <li><strong>Discuss:</strong> Share your insights with fellow readers</li>
+    </ul>
+</div>
+
+<h3>🔄 Easy Return Options</h3>
+<div style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div style="text-align: center;">
+        <p><strong>📱 Quick Return</strong></p>
+        {% if transaction.book.qr_code %}
+        <img src="{{ transaction.book.qr_code.url }}" alt="QR Code" style="width: 80px; height: 80px;">
+        <p>Scan QR code</p>
+        {% endif %}
+    </div>
+    <div style="text-align: center;">
+        <p><strong>💻 Online Return</strong></p>
+        <p>Use dashboard</p>
+    </div>
+    <div style="text-align: center;">
+        <p><strong>🏛️ In Person</strong></p>
+        <p>Visit library</p>
+    </div>
+</div>
+
+<p>Enjoy the rest of your reading! If you need more time, you can request an extension through your dashboard.</p>
+
+<p>Happy reading,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this email because you have a book due soon at our library.</p>
+<p>
+    <a href="{% url 'transactions:transaction_list' %}">View My Books</a> |
+    <a href="{% url 'users:settings' %}">Email Preferences</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

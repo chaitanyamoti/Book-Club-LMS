@@ -1,0 +1,86 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+<div id="content-main">
+    <div class="module">
+        <div class="changelist-form-container">
+            <div class="changelist-form">
+                <h2>Email Analytics Dashboard</h2>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Emails Sent</h5>
+                                <p class="card-text display-4">{{ total_emails_sent }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Emails Opened</h5>
+                                <p class="card-text display-4">{{ total_emails_opened }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Open Rate</h5>
+                                <p class="card-text display-4">{{ overall_open_rate }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Analytics by Email Type</h3>
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Email Type</th>
+                            <th>Sent</th>
+                            <th>Opened</th>
+                            <th>Open Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for type_data in analytics_by_type %}
+                        <tr>
+                            <td>{{ type_data.email_type }}</td>
+                            <td>{{ type_data.sent_count }}</td>
+                            <td>{{ type_data.opened_count }}</td>
+                            <td>{{ type_data.open_rate|floatformat:2 }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <h3>Analytics by A/B Test Variant</h3>
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Campaign ID</th>
+                            <th>Variant</th>
+                            <th>Sent</th>
+                            <th>Opened</th>
+                            <th>Open Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for variant_data in analytics_by_variant %}
+                        <tr>
+                            <td>{{ variant_data.campaign_id|default:"N/A" }}</td>
+                            <td>{{ variant_data.ab_test_variant|default:"Control" }}</td>
+                            <td>{{ variant_data.sent_count }}</td>
+                            <td>{{ variant_data.opened_count }}</td>
+                            <td>{{ variant_data.open_rate|floatformat:2 }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

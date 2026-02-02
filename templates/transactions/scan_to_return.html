@@ -1,0 +1,47 @@
+{% extends 'base_dashboard.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Scan to Return Book</h2>
+    <div id="qr-reader" style="width: 500px"></div>
+    <div id="qr-reader-results" class="mt-3"></div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function onScanSuccess(decodedText, decodedResult) {
+        // The decoded text is expected to be the book's ID or ISBN
+        console.log(`Scan result: ${decodedText}`);
+        
+        // Send the scanned data to the backend
+        fetch("{% url 'transactions:scan_to_return' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ book_id: decodedText })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultsDiv = document.getElementById('qr-reader-results');
+            if (data.success) {
+                resultsDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            } else {
+                resultsDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const resultsDiv = document.getElementById('qr-reader-results');
+            resultsDiv.innerHTML = `<div class="alert alert-danger">An error occurred.</div>`;
+        });
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+});
+</script>
+{% endblock %}

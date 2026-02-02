@@ -1,0 +1,117 @@
+{% extends "email/base.html" %}
+{% load static %}
+
+{% block subject %}Your Book is Ready - {{ transaction.book.title }}{% endblock %}
+
+{% block content %}
+<h2>📚 Your Book is Ready!</h2>
+
+<p>Hi {{ transaction.user.get_full_name|default:transaction.user.username }},</p>
+
+<p>Great news! Your requested book has been issued and is ready for you to enjoy.</p>
+
+<div class="book-card">
+    <div style="display: flex; align-items: center;">
+        {% if transaction.book.cover_image %}
+        <img src="{{ transaction.book.cover_image.url }}" alt="{{ transaction.book.title }}" style="width: 80px; height: 120px; object-fit: cover; margin-right: 15px; border-radius: 5px;">
+        {% endif %}
+        <div>
+            <div class="book-title">{{ transaction.book.title }}</div>
+            <div class="book-author">by {{ transaction.book.author }}</div>
+            {% if transaction.book.genre %}
+            <p><strong>Genre:</strong> {{ transaction.book.genre }}</p>
+            {% endif %}
+            <p><strong>Due Date:</strong> {{ transaction.due_date|date:"F j, Y" }}</p>
+            <p><strong>Issued Date:</strong> {{ transaction.issue_date|date:"F j, Y" }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="highlight">
+    <h3>📅 Important Dates</h3>
+    <div style="display: flex; justify-content: space-between; margin: 15px 0;">
+        <div style="text-align: center; flex: 1;">
+            <div style="font-size: 18px; font-weight: bold; color: #007bff;">{{ transaction.issue_date|date:"M j" }}</div>
+            <div style="font-size: 12px; color: #666;">Issued</div>
+        </div>
+        <div style="text-align: center; flex: 1;">
+            <div style="font-size: 18px; font-weight: bold; color: #28a745;">{{ transaction.due_date|date:"M j" }}</div>
+            <div style="font-size: 12px; color: #666;">Due Date</div>
+        </div>
+        <div style="text-align: center; flex: 1;">
+            <div style="font-size: 18px; font-weight: bold; color: #ffc107;">{{ days_until_due }}</div>
+            <div style="font-size: 12px; color: #666;">Days Left</div>
+        </div>
+    </div>
+</div>
+
+<h3>🔄 How to Return Your Book</h3>
+<div style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div style="text-align: center;">
+        <p><strong>📱 Quick Return</strong></p>
+        {% if transaction.book.qr_code %}
+        <img src="{{ transaction.book.qr_code.url }}" alt="QR Code" style="width: 80px; height: 80px;">
+        <p>Scan QR code at return station</p>
+        {% else %}
+        <p>QR code will be generated soon</p>
+        {% endif %}
+    </div>
+    <div style="text-align: center;">
+        <p><strong>💻 Online Return</strong></p>
+        <p>Use the return button in your dashboard</p>
+    </div>
+    <div style="text-align: center;">
+        <p><strong>🏛️ In Person</strong></p>
+        <p>Return to the library during open hours</p>
+    </div>
+</div>
+
+<h3>📖 Reading Tips & Recommendations</h3>
+<div class="highlight" style="border-left-color: #28a745;">
+    <h4>💡 Make the Most of Your Reading Time</h4>
+    <ul>
+        <li><strong>Track Progress:</strong> Log your reading in the app to stay motivated</li>
+        <li><strong>Set Goals:</strong> Aim to read a little each day to build a habit</li>
+        <li><strong>Take Notes:</strong> Jot down your thoughts and favorite passages</li>
+        <li><strong>Join Discussions:</strong> Share your insights with other readers</li>
+    </ul>
+</div>
+
+{% if recommended_books %}
+<h3>📚 You Might Also Like</h3>
+<p>Based on your reading preferences, here are some other books you might enjoy:</p>
+{% for book in recommended_books %}
+<div class="book-card" style="margin-bottom: 10px;">
+    <div class="book-title">{{ book.title }}</div>
+    <div class="book-author">by {{ book.author }}</div>
+    <p>{{ book.description|truncatechars:100 }}</p>
+</div>
+{% endfor %}
+{% endif %}
+
+<h3>❓ Need Help?</h3>
+<p>Questions about your loan or need assistance?</p>
+<ul>
+    <li>Check our <a href="/docs/USAGE.md">User Guide</a> for detailed instructions</li>
+    <li>Contact support if you have any issues</li>
+    <li>Visit your dashboard to manage all your loans</li>
+</ul>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="/transactions/" class="button">View My Books</a>
+    <a href="/reading/add/" class="button" style="background: #28a745; margin-left: 10px;">Start Reading Log</a>
+</div>
+
+<p>Happy reading! We hope you enjoy your book and look forward to hearing about your experience.</p>
+
+<p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this email because you have successfully borrowed a book from our library.</p>
+<p>
+    <a href="{% url 'transactions:transaction_list' %}">View All Loans</a> |
+    <a href="{% url 'users:settings' %}">Email Preferences</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

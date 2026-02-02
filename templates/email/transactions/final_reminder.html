@@ -1,0 +1,73 @@
+{% extends "email/base.html" %}
+{% load static %}
+
+{% block subject %}🚨 Final Notice: {{ transaction.book.title }} due today{% endblock %}
+
+{% block content %}
+<h2>🚨 Final Notice</h2>
+
+<p>Hi {{ transaction.user.get_full_name|default:transaction.user.username }},</p>
+
+<div class="highlight" style="border-left-color: #fd7e14; background-color: #ffe5d0;">
+    <h3 style="color: #8b4513;">This is your final reminder</h3>
+    <p><strong>{{ transaction.book.title }}</strong> is due <strong>today</strong>. Please return it immediately to avoid overdue charges.</p>
+</div>
+
+<div class="book-card">
+    <div style="display: flex; align-items: center;">
+        {% if transaction.book.cover_image %}
+        <img src="{{ transaction.book.cover_image.url }}" alt="{{ transaction.book.title }}" style="width: 80px; height: 120px; object-fit: cover; margin-right: 15px; border-radius: 5px;">
+        {% endif %}
+        <div>
+            <div class="book-title">{{ transaction.book.title }}</div>
+            <div class="book-author">by {{ transaction.book.author }}</div>
+            <p><strong>Due Date:</strong> {{ transaction.due_date|date:"l, F j, Y" }}</p>
+            <p><strong>Status:</strong> <span style="color: #fd7e14; font-weight: bold;">Due today</span></p>
+        </div>
+    </div>
+</div>
+
+<h3>🔄 Return Your Book Now</h3>
+<div style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div style="text-align: center;">
+        <p><strong>📱 Quick Return</strong></p>
+        {% if transaction.book.qr_code %}
+        <img src="{{ transaction.book.qr_code.url }}" alt="QR Code" style="width: 80px; height: 80px;">
+        <p>Scan QR code at return station</p>
+        {% else %}
+        <p>QR code will be generated soon</p>
+        {% endif %}
+    </div>
+    <div style="text-align: center;">
+        <p><strong>💻 Online Return</strong></p>
+        <p>Use the return button in your dashboard</p>
+    </div>
+    <div style="text-align: center;">
+        <p><strong>🏛️ In Person</strong></p>
+        <p>Return to the library during open hours</p>
+    </div>
+</div>
+
+<div class="highlight" style="border-left-color: #6c757d; background-color: #f8f9fa;">
+    <h3 style="color: #495057;">💰 Late Fees</h3>
+    <p>Late returns may incur daily fees. Returning the book today will help you avoid these charges.</p>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{% url 'transactions:transaction_list' %}" class="button" style="background: #fd7e14;">Return Book Now</a>
+    <a href="{% url 'users:settings' %}" class="button" style="background: #6c757d; margin-left: 10px;">Contact Library</a>
+</div>
+
+<p>Your prompt attention to this matter is greatly appreciated. Thank you for helping us maintain our collection for all members.</p>
+
+<p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this email because you have a book due today at our library.</p>
+<p>
+    <a href="{% url 'transactions:transaction_list' %}">View My Books</a> |
+    <a href="{% url 'users:settings' %}">Email Preferences</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

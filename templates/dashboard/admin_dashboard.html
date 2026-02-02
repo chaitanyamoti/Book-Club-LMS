@@ -1,0 +1,301 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block dashboard_content %}
+<!-- System Alerts -->
+{% if alerts %}
+<div class="row mb-4">
+    <div class="col-12">
+        {% for alert in alerts %}
+        <div class="alert alert-{{ alert.type }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ alert.message }}
+            {% if alert.action %}
+            <a href="#" class="alert-link">{{ alert.action }}</a>
+            {% endif %}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Key Metrics -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card dashboard-card h-100 border-start border-primary border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="flex-grow-1">
+                        <div class="text-primary fw-bold text-uppercase small mb-1">
+                            Total Books
+                        </div>
+                        <div class="h4 mb-0 fw-bold">{{ total_books }}</div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-book fa-2x text-primary opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card dashboard-card h-100 border-start border-success border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="flex-grow-1">
+                        <div class="text-success fw-bold text-uppercase small mb-1">
+                            Available Books
+                        </div>
+                        <div class="h4 mb-0 fw-bold">{{ available_books }}</div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle fa-2x text-success opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card dashboard-card h-100 border-start border-info border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="flex-grow-1">
+                        <div class="text-info fw-bold text-uppercase small mb-1">
+                            Active Members
+                        </div>
+                        <div class="h4 mb-0 fw-bold">{{ active_members }}/{{ total_members }}</div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-users fa-2x text-info opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card dashboard-card h-100 border-start border-warning border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="flex-grow-1">
+                        <div class="text-warning fw-bold text-uppercase small mb-1">
+                            Overdue Books
+                        </div>
+                        <div class="h4 mb-0 fw-bold">{{ overdue_books }}</div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle fa-2x text-warning opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Activity -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-history me-2"></i>Recent Transactions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>Member</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in recent_transactions %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <div class="font-weight-bold">{{ transaction.book.title|truncatechars:30 }}</div>
+                                            <small class="text-muted">{{ transaction.book.author|truncatechars:20 }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ transaction.user.get_full_name|default:transaction.user.username }}</td>
+                                <td>
+                                    <span class="badge bg-{% if transaction.transaction_type == 'ISSUE' %}primary{% else %}success{% endif %}">
+                                        {{ transaction.transaction_type }}
+                                    </span>
+                                </td>
+                                <td>{{ transaction.issue_date|date:"M j, Y" }}</td>
+                                <td>
+                                    {% if transaction.is_overdue and not transaction.return_date %}
+                                        <span class="badge bg-danger">Overdue</span>
+                                    {% elif transaction.return_date %}
+                                        <span class="badge bg-secondary">Returned</span>
+                                    {% else %}
+                                        <span class="badge bg-info">Active</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions & Stats -->
+    <div class="col-lg-4 mb-4">
+        <!-- Monthly Activity -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-calendar-alt me-2"></i>This Month
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3">
+                        <i class="fas fa-arrow-up text-success fa-2x"></i>
+                    </div>
+                    <div>
+                        <div class="h5 mb-0">{{ recent_issues }}</div>
+                        <small class="text-muted">Books Issued</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        <i class="fas fa-arrow-down text-info fa-2x"></i>
+                    </div>
+                    <div>
+                        <div class="h5 mb-0">{{ recent_returns }}</div>
+                        <small class="text-muted">Books Returned</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-tasks me-2"></i>Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'books:book_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Book
+                    </a>
+                    <a href="{% url 'admin:core_transaction_changelist' %}" class="btn btn-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>View Overdue ({{ overdue_books }})
+                    </a>
+                    <button type="button" class="btn btn-danger" onclick="sendBulkReminders()">
+                        <i class="fas fa-envelope me-2"></i>Send Overdue Reminders
+                        <span class="badge bg-light text-dark ms-2" id="reminder-count">{{ overdue_books }}</span>
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="bulkMarkAvailable()">
+                        <i class="fas fa-check-circle me-2"></i>Bulk Mark Available
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="generateBulkQRCodes()">
+                        <i class="fas fa-qrcode me-2"></i>Generate QR Codes
+                    </button>
+                    <a href="{% url 'books:book_table' %}" class="btn btn-secondary">
+                        <i class="fas fa-table me-2"></i>Manage Books
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Automation Status -->
+        <div class="card shadow mt-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-cog me-2"></i>Automation Status
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-clock text-warning fa-2x"></i>
+                            </div>
+                            <div>
+                                <div class="h6 mb-0">Last Reminder Run</div>
+                                <small class="text-muted">Today 9:00 AM</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-chart-line text-info fa-2x"></i>
+                            </div>
+                            <div>
+                                <div class="h6 mb-0">Auto Reports</div>
+                                <small class="text-muted">Weekly enabled</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popular Books -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-info">
+                    <i class="fas fa-star me-2"></i>Most Popular Books
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for book in popular_books %}
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ book.title|truncatechars:25 }}</h6>
+                                <p class="card-text small text-muted">{{ book.author|truncatechars:20 }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ book.issue_count }} issues</small>
+                                    <span class="badge bg-{% if book.available_copies > 0 %}success{% else %}warning{% endif %}">
+                                        {% if book.available_copies > 0 %}Available{% else %}Checked Out{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add any dashboard-specific JavaScript here
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh dashboard data every 5 minutes
+    setInterval(function() {
+        // Could add AJAX calls to refresh data
+    }, 300000);
+});
+</script>
+{% endblock %}

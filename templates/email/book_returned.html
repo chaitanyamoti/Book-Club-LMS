@@ -1,0 +1,113 @@
+{% extends "email/base.html" %}
+{% load static %}
+
+{% block subject %}📚 Book Returned Successfully - {{ book.title }}{% endblock %}
+
+{% block content %}
+<h2>📚 Book Returned Successfully!</h2>
+
+<p>Dear {{ user.get_full_name|default:user.username }},</p>
+
+<div class="highlight" style="border-left-color: #28a745; background-color: #d4edda;">
+    <h3 style="color: #155724;">✅ Thank you for returning your book!</h3>
+    <p>We appreciate your timely return and responsible borrowing. Your book is now available for other readers to enjoy.</p>
+</div>
+
+<div class="book-card" style="border-left: 4px solid #28a745;">
+    <div style="display: flex; align-items: center;">
+        {% if book.cover_image %}
+        <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="width: 60px; height: 90px; object-fit: cover; margin-right: 15px; border-radius: 3px;">
+        {% endif %}
+        <div style="flex: 1;">
+            <div class="book-title" style="color: #333; font-size: 16px; margin-bottom: 5px;">{{ book.title }}</div>
+            <div class="book-author" style="color: #666; margin-bottom: 5px;">by {{ book.author }}</div>
+            <p style="margin: 5px 0;"><strong>Return Date:</strong> {{ return_date|date:"l, F j, Y" }}</p>
+            {% if condition_notes %}
+            <p style="margin: 5px 0;"><strong>Condition Notes:</strong> {{ condition_notes }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if reading_stats %}
+<h3>📊 Your Reading Journey</h3>
+<div class="stats" style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div class="stats-item">
+        <div class="stats-number" style="color: #28a745;">{{ reading_stats.books_this_month }}</div>
+        <div class="stats-label">Books This Month</div>
+    </div>
+    <div class="stats-item">
+        <div class="stats-number" style="color: #007bff;">{{ reading_stats.total_books_read }}</div>
+        <div class="stats-label">Total Books Read</div>
+    </div>
+    <div class="stats-item">
+        <div class="stats-number" style="color: #ffc107;">{{ reading_stats.current_streak }}</div>
+        <div class="stats-label">Reading Streak</div>
+    </div>
+</div>
+{% endif %}
+
+<h3>🎯 What's Next?</h3>
+<p>Ready to continue your reading adventure? Here are some options:</p>
+
+<div style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div style="text-align: center; flex: 1;">
+        <p><strong>📚 Browse Books</strong></p>
+        <p style="font-size: 12px;">Discover new titles</p>
+    </div>
+    <div style="text-align: center; flex: 1;">
+        <p><strong>📝 Log Reading</strong></p>
+        <p style="font-size: 12px;">Track your progress</p>
+    </div>
+    <div style="text-align: center; flex: 1;">
+        <p><strong>🎉 Earn Badges</strong></p>
+        <p style="font-size: 12px;">Unlock achievements</p>
+    </div>
+</div>
+
+{% if recommended_books %}
+<h3>📖 You Might Also Like</h3>
+<p>Based on your reading history, here are some books you might enjoy next:</p>
+{% for rec_book in recommended_books %}
+<div class="book-card" style="margin-bottom: 10px;">
+    <div style="display: flex; align-items: center;">
+        {% if rec_book.cover_image %}
+        <img src="{{ rec_book.cover_image.url }}" alt="{{ rec_book.title }}" style="width: 50px; height: 75px; object-fit: cover; margin-right: 10px; border-radius: 3px;">
+        {% endif %}
+        <div style="flex: 1;">
+            <div class="book-title" style="font-size: 14px; margin-bottom: 3px;">{{ rec_book.title }}</div>
+            <div class="book-author" style="font-size: 12px; color: #666;">by {{ rec_book.author }}</div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<h3>💬 Share Your Thoughts</h3>
+<p>We'd love to hear about your reading experience! Your feedback helps us improve our collection.</p>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{% url 'reading:add' %}" class="button" style="background: #28a745;">Log Reading Progress</a>
+    <a href="{% url 'books:book_list' %}" class="button" style="background: #007bff; margin-left: 10px;">Browse More Books</a>
+</div>
+
+{% if achievements %}
+<div class="highlight" style="border-left-color: #ffc107; background-color: #fff3cd;">
+    <h3 style="color: #856404;">🏆 Achievement Unlocked!</h3>
+    <p>Congratulations! You've earned: <strong>{{ achievements|join:", " }}</strong></p>
+</div>
+{% endif %}
+
+<p>Thank you for being a valued member of our Book Club community!</p>
+
+<p>Happy reading,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this email because you recently returned a book to our library.</p>
+<p>
+    <a href="{% url 'reading:progress' %}">View Reading Stats</a> |
+    <a href="{% url 'users:settings' %}">Email Preferences</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

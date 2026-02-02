@@ -1,0 +1,30 @@
+{% extends 'base_dashboard.html' %}
+
+{% block page_title %}Announcements{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Latest Announcements</h5>
+            </div>
+            {% if announcements %}
+                <div class="list-group list-group-flush">
+                    {% for announcement in announcements %}
+                        <div class="list-group-item">
+                            <h6 class="mb-1">{{ announcement.title }}</h6>
+                            <small class="text-muted">{{ announcement.pub_date|date:"F d, Y, P" }}</small>
+                            <p class="mb-1">{{ announcement.content|linebreaksbr }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <p class="text-muted mb-0">No active announcements at this time.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

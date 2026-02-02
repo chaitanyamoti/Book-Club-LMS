@@ -1,0 +1,83 @@
+{% extends "email/base.html" %}
+{% load static %}
+
+{% block subject %}🚨 Overdue: {{ transaction.book.title }} needs to be returned{% endblock %}
+
+{% block content %}
+<h2>🚨 Overdue Notice</h2>
+
+<p>Hi {{ transaction.user.get_full_name|default:transaction.user.username }},</p>
+
+<div class="highlight" style="border-left-color: #dc3545; background-color: #f8d7da;">
+    <h3 style="color: #721c24;">Your book is now overdue</h3>
+    <p><strong>{{ transaction.book.title }}</strong> was due on {{ transaction.due_date|date:"l, F j, Y" }} and needs to be returned immediately.</p>
+</div>
+
+<div class="book-card" style="border-left: 4px solid #dc3545;">
+    <div style="display: flex; align-items: center;">
+        {% if transaction.book.cover_image %}
+        <img src="{{ transaction.book.cover_image.url }}" alt="{{ transaction.book.title }}" style="width: 80px; height: 120px; object-fit: cover; margin-right: 15px; border-radius: 5px;">
+        {% endif %}
+        <div>
+            <div class="book-title">{{ transaction.book.title }}</div>
+            <div class="book-author">by {{ transaction.book.author }}</div>
+            <p><strong>Due Date:</strong> {{ transaction.due_date|date:"l, F j, Y" }}</p>
+            <p><strong>Days Overdue:</strong> <span style="color: #dc3545; font-weight: bold;">{{ days_overdue|default:1 }} day{% if days_overdue|default:1 > 1 %}s{% endif %}</span></p>
+        </div>
+    </div>
+</div>
+
+<h3>💰 Late Fees</h3>
+<div class="highlight" style="border-left-color: #ffc107; background-color: #fff3cd;">
+    <p>Late returns may incur daily fees. Please return the book as soon as possible to minimize charges.</p>
+</div>
+
+<h3>🔄 Return Options</h3>
+<div style="display: flex; justify-content: space-around; margin: 20px 0;">
+    <div style="text-align: center;">
+        <p><strong>📱 Quick Return</strong></p>
+        {% if transaction.book.qr_code %}
+        <img src="{{ transaction.book.qr_code.url }}" alt="QR Code" style="width: 80px; height: 80px;">
+        <p>Scan QR code at return station</p>
+        {% else %}
+        <p>QR code will be generated soon</p>
+        {% endif %}
+    </div>
+    <div style="text-align: center;">
+        <p><strong>💻 Online Return</strong></p>
+        <p>Use the return button in your dashboard</p>
+    </div>
+    <div style="text-align: center;">
+        <p><strong>🏛️ In Person</strong></p>
+        <p>Return to the library during open hours</p>
+    </div>
+</div>
+
+<h3>📞 Contact Us</h3>
+<p>If you have any questions or need assistance:</p>
+<ul>
+    <li>Contact the library administrator</li>
+    <li>Visit your dashboard to check your account status</li>
+    <li>Request an extension if you need more time</li>
+</ul>
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{% url 'transactions:transaction_list' %}" class="button" style="background: #dc3545;">Return Book Now</a>
+    <a href="{% url 'users:settings' %}" class="button" style="background: #6c757d; margin-left: 10px;">Contact Admin</a>
+</div>
+
+<p>Your prompt attention to this matter will help you avoid additional charges and maintain your borrowing privileges.</p>
+
+<p>Thank you for your cooperation.</p>
+
+<p>Best regards,<br>The Book Club Team</p>
+{% endblock %}
+
+{% block footer %}
+<p>You're receiving this email because you have an overdue book that needs to be returned immediately.</p>
+<p>
+    <a href="{% url 'transactions:transaction_list' %}">View Overdue Books</a> |
+    <a href="{% url 'users:settings' %}">Email Preferences</a>
+</p>
+<p>© 2024 Book Club Manager. All rights reserved.</p>
+{% endblock %}

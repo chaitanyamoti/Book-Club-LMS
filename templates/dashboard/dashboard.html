@@ -1,0 +1,300 @@
+{% extends 'base_dashboard.html' %}
+{% load core_tags %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_description %}Overview of your reading activity and available books{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'books:book_list' %}" class="btn btn-primary">
+    <i class="bi bi-plus-circle me-1"></i>Add Book
+</a>
+<a href="{% url 'reading:create_reading_log' %}" class="btn btn-outline-primary">
+    <i class="bi bi-journal-plus me-1"></i>Log Reading
+</a>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Welcome Message with Streak -->
+<div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <div class="card-body p-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h2 class="mb-2">Welcome back, {{ user.get_full_name|default:user.username }}!</h2>
+                {% if user.userprofile.streak_days > 0 %}
+                <p class="mb-0 fs-5">
+                    <i class="bi bi-fire me-2"></i>
+                    You're on a {{ user.userprofile.streak_days }}-day reading streak! Keep it up!
+                </p>
+                {% else %}
+                <p class="mb-0 fs-5">
+                    <i class="bi bi-book me-2"></i>
+                    Ready to start your reading journey? Let's begin today!
+                </p>
+                {% endif %}
+            </div>
+            <div class="col-lg-4 text-center">
+                {% if user.userprofile.streak_days > 0 %}
+                <div class="display-1 fw-bold mb-2">{{ user.userprofile.streak_days }}</div>
+                <div class="fs-5">Day Streak</div>
+                <i class="bi bi-trophy-fill fs-1 text-warning mt-2"></i>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-light border-0">
+        <h5 class="mb-0">
+            <i class="bi bi-lightning-charge me-2 text-warning"></i>
+            Quick Actions
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <a href="{% url 'books:book_list' %}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                    <i class="bi bi-book fs-2 mb-2"></i>
+                    <span class="fw-medium">Browse Books</span>
+                    <small class="text-muted">Find your next read</small>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{% url 'reading:create_reading_log' %}" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                    <i class="bi bi-journal-plus fs-2 mb-2"></i>
+                    <span class="fw-medium">Log Reading</span>
+                    <small class="text-muted">Track your progress</small>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{% url 'reading:reading_stats' %}" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                    <i class="bi bi-graph-up fs-2 mb-2"></i>
+                    <span class="fw-medium">My Progress</span>
+                    <small class="text-muted">View statistics</small>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{% url 'bookrequests:request_list' %}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                    <i class="bi bi-hand-thumbs-up fs-2 mb-2"></i>
+                    <span class="fw-medium">Request Books</span>
+                    <small class="text-muted">Suggest new titles</small>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Announcements Section -->
+    {% if announcements %}
+    <div class="col-12 mb-4">
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">📢 Latest Announcements</h5>
+                <small>Stay updated with library news and events</small>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for announcement in announcements %}
+                <div class="list-group-item">
+                    <h6 class="mb-1">{{ announcement.title }}</h6>
+                    <small class="text-muted">{{ announcement.pub_date|date:"F d, Y, P" }}</small>
+                    <p class="mb-1">{{ announcement.content|truncatechars:150 }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer text-center">
+                <a href="{% url 'notifications:announcement_list' %}" class="btn btn-sm btn-outline-info">View All Announcements</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Overdue Books Section -->
+    {% if overdue_transactions %}
+    <div class="col-12 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">⚠️ Overdue Books ({{ overdue_transactions.count }})</h5>
+                <small>Please return these books as soon as possible</small>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for tx in overdue_transactions %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ tx.book.title }}</strong> by {{ tx.book.author }}
+                        </div>
+                        <span class="text-danger fw-bold">Due: {{ tx.due_date|date:"M d, Y" }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+<!-- Available Books Section -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-light border-0">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">
+                    <i class="bi bi-book me-2 text-primary"></i>
+                    Available Books
+                </h5>
+                <small class="text-muted">Browse books you can check out</small>
+            </div>
+            <a href="{% url 'books:book_list' %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-grid me-1"></i>View All
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if available_books %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+            {% for book in available_books|slice:":8" %}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm book-card">
+                    <!-- Image Container with Badge -->
+                    <div class="position-relative overflow-hidden" style="height: 200px;">
+                        {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" class="card-img-top h-100 object-fit-cover" alt="{{ book.title }}">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                            <i class="bi bi-book text-muted fs-1"></i>
+                        </div>
+                        {% endif %}
+
+                        <!-- Genre Badge -->
+                        {% if book.genre %}
+                        <span class="badge bg-primary position-absolute top-2 end-2">{{ book.genre }}</span>
+                        {% endif %}
+
+                        <!-- Quick Action Buttons (on hover) -->
+                        <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 p-2 d-flex gap-2 opacity-0 transition book-card-hover">
+                            <button class="btn btn-sm btn-light flex-grow-1" onclick="window.location.href='{% url 'books:book_detail' book.id %}'">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                            <button class="btn btn-sm btn-warning flex-grow-1" onclick="window.location.href='{% url 'reading:create_reading_log_for_book' book_id=book.id %}'">
+                                <i class="bi bi-bookmark"></i> Read
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="card-body d-flex flex-column flex-grow-1">
+                        <h6 class="card-title fw-bold mb-1">{{ book.title|truncatechars:35 }}</h6>
+                        <p class="card-text text-muted small mb-2">
+                            <i class="bi bi-person"></i> {{ book.author|truncatechars:30 }}
+                        </p>
+
+                        <!-- Info Row -->
+                        <div class="small text-muted mb-3">
+                            {% if book.publication_year %}
+                            <span><i class="bi bi-calendar"></i> {{ book.publication_year }}</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Status indicator -->
+                        <div class="mb-2">
+                            <span class="badge bg-success">Available</span>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer with Actions -->
+                    <div class="card-footer bg-transparent border-top">
+                        <a href="{% url 'books:book_detail' book.id %}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-info-circle me-1"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="mb-3">
+                <i class="bi bi-book text-muted fs-1"></i>
+            </div>
+            <h5 class="text-muted">No books available right now</h5>
+            <p class="text-muted mb-3">Check back later or request a book!</p>
+            <a href="{% url 'bookrequests:request_list' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Request a Book
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+    <!-- My Issued Books Section -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">📖 My Issued Books ({{ open_transactions.count }})</h5>
+                <small>Track your reading progress for each book</small>
+            </div>
+            <div class="card-body">
+                {% if open_transactions %}
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                        {% for tx in open_transactions %}
+                            <div class="col">
+                                <div class="card h-100 border">
+                                    {% if tx.book.cover_image %}
+                                    <img src="{{ tx.book.cover_image.url }}" class="card-img-top" alt="{{ tx.book.title }}" style="height: 200px; object-fit: cover;">
+                                    {% endif %}
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ tx.book.title }}</h6>
+                                        <p class="card-subtitle mb-2 text-muted small">{{ tx.book.author }}</p>
+
+                                        <!-- Progress Bar -->
+                                        {% with latest_progress=reading_progress|get_item:tx.book.id %}
+                                        {% if latest_progress %}
+                                        <div class="mb-2">
+                                            <small class="text-muted">Reading Progress</small>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ latest_progress.progress }}%" aria-valuenow="{{ latest_progress.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">{{ latest_progress.progress }}% complete</small>
+                                        </div>
+                                        {% else %}
+                                        <div class="mb-2">
+                                            <small class="text-muted">Not started yet</small>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-secondary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                    <div class="card-footer bg-transparent border-top-0">
+                                        <p class="card-text {% if tx in overdue_transactions %}text-danger{% endif %} mb-2">
+                                            <small>Due: {{ tx.due_date|date:"M d, Y" }}</small>
+                                        </p>
+                                        <div class="d-flex gap-2">
+                                            <a href="{% url 'reading:create_reading_log_for_book' book_id=tx.book.id %}" class="btn btn-primary btn-sm flex-fill">
+                                                📖 Update Progress
+                                            </a>
+                                            {% if request.user.is_staff or request.user.is_superuser %}
+                                            <a href="{% url 'transactions:return_book' tx.pk %}" class="btn btn-outline-success btn-sm">
+                                                Return
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="bi bi-journal-bookmark fa-3x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">No books currently checked out</h5>
+                        <p class="text-muted mb-3">Ready to start reading? Browse our collection!</p>
+                        <a href="{% url 'books:book_list' %}" class="btn btn-primary">Browse Books</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

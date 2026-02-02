@@ -1,0 +1,143 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block page_title %}Books{% endblock %}
+{% block page_title_h1 %}Browse Books{% endblock %}
+{% block page_description %}Explore our collection of available books.{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb" class="mb-4">
+  <ol class="breadcrumb bg-light p-3 rounded">
+    <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Books</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2 flex-wrap">
+  <a href="{% url 'books:book_add' %}" class="btn btn-success">
+    <i class="bi bi-plus-circle me-2"></i>Add Book
+  </a>
+  <a href="{% url 'books:book_table' %}" class="btn btn-info">
+    <i class="bi bi-table me-2"></i>Manage Books
+  </a>
+</div>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid px-3 px-md-4">
+  <!-- Search Form and Filters -->
+  <div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body">
+      <form method="get" class="row g-3 align-items-center">
+        <div class="col-md-6">
+          <input type="text" name="q" value="{{ request.GET.q }}" class="form-control"
+                 placeholder="Search by title, author, or genre..." aria-label="Search books">
+        </div>
+        <div class="col-md-3">
+          <select name="genre" class="form-select">
+            <option value="">All Genres</option>
+            {% for genre_option in genres %} {# Assuming 'genres' context variable is passed from view #}
+                <option value="{{ genre_option }}" {% if request.GET.genre == genre_option %}selected{% endif %}>{{ genre_option }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary flex-grow-1">
+            <i class="bi bi-search"></i> Search
+          </button>
+          {% if request.GET.q or request.GET.genre %}
+          <a href="{% url 'books:book_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Clear
+          </a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Books Grid -->
+  <div class="row g-4"> {# Changed g-3 to g-4 for more spacing #}
+    {% for book in books %}
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+      <div class="book-card card border-0 shadow-sm h-100">
+        <!-- Image Container with Badge -->
+        <div class="position-relative overflow-hidden" style="height: 280px;">
+          {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" class="card-img-top h-100 object-fit-cover" 
+                 alt="{{ book.title }} cover">
+          {% else %}
+            <img src="{% static 'images/default_book_cover.png' %}" class="card-img-top h-100 object-fit-cover" 
+                 alt="Default book cover">
+          {% endif %}
+          
+          <!-- Genre Badge -->
+          {% if book.genre %}
+            <span class="badge bg-primary position-absolute top-2 end-2">
+              {{ book.genre }}
+            </span>
+          {% endif %}
+          
+          <!-- Quick Action Buttons (on hover) -->
+          <div class="position-absolute bottom-0 start-0 end-0 
+                      bg-dark bg-opacity-75 p-2 d-flex gap-2 
+                      opacity-0 transition book-card-hover">
+            <a href="{% url 'books:book_detail' book.pk %}" class="btn btn-sm btn-light flex-grow-1">
+              <i class="bi bi-eye"></i> View
+            </a>
+            {# Bookmark functionality is not directly implemented yet, so this will be a placeholder #}
+            <button class="btn btn-sm btn-warning flex-grow-1">
+              <i class="bi bi-bookmark"></i> Bookmark
+            </button>
+          </div>
+        </div>
+        
+        <!-- Card Content -->
+        <div class="card-body d-flex flex-column flex-grow-1">
+          <h5 class="card-title fw-bold mb-1">{{ book.title }}</h5>
+          <p class="card-text text-muted small mb-2">
+            <i class="bi bi-person"></i> {{ book.author }}
+          </p>
+          
+          <!-- Info Row - Assuming 'publication_year' and 'average_rating' fields exist on Book model -->
+          <div class="small text-muted mb-3">
+            {% if book.publication_year %}
+              <span><i class="bi bi-calendar"></i> {{ book.publication_year }}</span>
+            {% endif %}
+            {# Assuming book.average_rating exists and is a float #}
+            {% if book.average_rating %}
+              <span class="ms-2"><i class="bi bi-star-fill text-warning"></i> {{ book.average_rating|floatformat:1 }}/5</span>
+            {% endif %}
+          </div>
+          
+          <!-- Status indicator -->
+          <div class="mb-2">
+            {% if book.currently_out %} {# Assuming a boolean field 'currently_out' on Book model #}
+              <span class="badge bg-danger">Borrowed</span>
+            {% else %}
+              <span class="badge bg-success">Available</span>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Card Footer with Actions -->
+        <div class="card-footer bg-transparent border-top">
+          <a href="{% url 'books:book_detail' book.pk %}" class="btn btn-primary btn-sm w-100">
+            View Details
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="text-center py-5">
+        <i class="bi bi-journal-x fa-3x text-muted mb-3"></i> {# Changed icon to Bootstrap Icon #}
+        <h4 class="text-muted">No books found</h4>
+        <p class="text-muted">Try adjusting your search criteria or check back later.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
