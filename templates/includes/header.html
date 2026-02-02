@@ -8,48 +8,60 @@
       <span class="ms-2 fw-bold">Book Club Manager</span>
     </a>
     
-    <!-- Search Bar (Center) -->
-    <div class="flex-grow-1 mx-3 d-none d-lg-block"> {# Hide on small screens #}
-      <form class="d-flex" role="search" action="{% url 'books:book_list' %}" method="get">
-        <input class="form-control form-control-sm" type="search" name="q"
-               placeholder="Search books, authors, members..." aria-label="Search">
-      </form>
-    </div>
-    
-    <!-- Right Section -->
-    <div class="navbar-nav">
-      {% if user.is_authenticated %}
-      <li class="nav-item">
-        <a class="nav-link position-relative" href="{% url 'notifications:inbox' %}" title="Notifications">
-          <i class="bi bi-bell"></i>
-          {% if unread_notifications_count > 0 %}
-            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">
-              {{ unread_notifications_count }}
-              <span class="visually-hidden">unread notifications</span>
-            </span>
-          {% endif %}
-        </a>
-      </li>
-      <li class="nav-item dropdown ms-2">
-        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-          {% if user.userprofile.avatar %}
-              <img src="{{ user.userprofile.avatar.url }}" alt="User Avatar" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
-          {% else %}
-              <i class="bi bi-person-circle"></i>
-          {% endif %}
-          <span class="ms-1">{{ user.username }}</span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-          <li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="bi bi-person"></i> Profile</a></li>
-          <li><a class="dropdown-item" href="{% url 'users:settings' %}"><i class="bi bi-gear"></i> Settings</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="{% url 'users:logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
-        </ul>
-      </li>
-      {% else %}
-        <li class="nav-item"><a class="nav-link btn btn-primary btn-sm text-white me-2" href="{% url 'users:register' %}">Register</a></li>
-        <li class="nav-item"><a class="nav-link btn btn-outline-primary btn-sm" href="{% url 'users:login' %}">Login</a></li>
-      {% endif %}
+    <!-- Toggler for mobile navigation -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNavbarCollapse" aria-controls="headerNavbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="headerNavbarCollapse">
+      <!-- Search Bar (Center, but within collapse for mobile) -->
+      <div class="flex-grow-1 mx-3 d-lg-block"> {# Always visible on lg+, but part of collapse #}
+        <form class="d-flex" role="search" action="{% url 'books:book_list' %}" method="get">
+          <input class="form-control form-control-sm" type="search" name="q"
+                 placeholder="Search books, authors, members..." aria-label="Search">
+        </form>
+      </div>
+      
+      <!-- Right Section -->
+      <ul class="navbar-nav mb-2 mb-lg-0"> {# Using ul for navbar-nav with spacing #}
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link position-relative" href="{% url 'notifications:inbox' %}" title="Notifications">
+            <i class="bi bi-bell"></i>
+            {% if unread_notifications_count > 0 %}
+              <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">
+                {{ unread_notifications_count }}
+                <span class="visually-hidden">unread notifications</span>
+              </span>
+            {% endif %}
+          </a>
+        </li>
+        <li class="nav-item dropdown ms-lg-2"> {# Add margin on large screens #}
+          <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            {% if user.userprofile.avatar %}
+                <img src="{{ user.userprofile.avatar.url }}" alt="User Avatar" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+            {% else %}
+                <i class="bi bi-person-circle"></i>
+            {% endif %}
+            <span class="ms-1">{{ user.username }}</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <li><a class="dropdown-item" href="{% url 'users:profile' %}"><i class="bi bi-person"></i> Profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'users:settings' %}"><i class="bi bi-gear"></i> Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'users:logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+          </ul>
+        </li>
+        {% else %}
+          <li class="nav-item mb-2 mb-lg-0 me-2"> {# Add bottom margin on small, right on large #}
+            <a class="nav-link btn btn-primary btn-sm text-white w-100" href="{% url 'users:register' %}">Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-outline-primary btn-sm w-100" href="{% url 'users:login' %}">Login</a>
+          </li>
+        {% endif %}
+      </ul>
     </div>
   </div>
 </header>
