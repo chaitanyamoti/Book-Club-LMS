@@ -21,11 +21,15 @@ from django.conf.urls.static import static
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import redirect
 
+# Store the original admin login view
+original_admin_login = admin.site.login
+
 def admin_login_redirect(request):
     """Redirect authenticated non-staff users away from admin login"""
     if request.user.is_authenticated and not request.user.is_staff:
         return redirect('core:dashboard')
-    return admin.site.login(request)
+    # Call the original login view
+    return original_admin_login(request)
 
 # Override admin login view
 admin.site.login = admin_login_redirect
