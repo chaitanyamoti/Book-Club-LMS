@@ -5,7 +5,7 @@ Handles progressive due date reminders and overdue escalations.
 from datetime import timedelta, datetime
 from django.utils import timezone
 from django.db import models
-from transactions.models import Transaction
+from core.models import Transaction
 from notifications.models import EmailLog, EmailPreference
 from .email_service import send_transaction_email
 
@@ -45,7 +45,7 @@ class ReminderScheduler:
             reminder_date = transaction.due_date + offset
 
             # Only schedule future reminders
-            if reminder_date > timezone.now():
+            if reminder_date > timezone.now().date():
                 reminders_to_schedule.append({
                     'transaction': transaction,
                     'reminder_type': reminder_type,
@@ -173,7 +173,8 @@ class ReminderScheduler:
         upcoming_transactions = Transaction.objects.filter(
             due_date__lte=cutoff_date,
             due_date__gte=timezone.now().date(),
-            status='ISSUED'
+            transaction_type='ISSUE',
+            return_date__isnull=True
         ).select_related('user', 'book')
 
         return upcoming_transactions
@@ -193,7 +194,8 @@ class ReminderScheduler:
         overdue_transactions = Transaction.objects.filter(
             due_date__lt=timezone.now().date(),
             due_date__gte=cutoff_date,
-            status='ISSUED'
+            transaction_type='ISSUE',
+            return_date__isnull=True
         ).select_related('user', 'book')
 
         return overdue_transactions

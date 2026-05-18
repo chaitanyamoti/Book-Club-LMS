@@ -15,9 +15,7 @@ django.setup()
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.contrib.auth.models import User
-from core.models import Transaction
-from books.models import Book
-from core.models import UserProfile
+from core.models import Transaction, Book, UserProfile
 from notifications.models import EmailPreference, EmailLog
 from notifications.utils.reminder_scheduler import reminder_scheduler
 from notifications.utils.email_service import transaction_email_service
@@ -56,15 +54,21 @@ def create_test_data():
     )
 
     # Create test book
-    book, created = Book.objects.get_or_create(
+    book, _ = Book.objects.get_or_create(
         title='Phase 2 Test Book',
-        author='Test Author',
         defaults={
+            'author': 'Test Author',
             'isbn': 'PHASE2123456',
             'genre': 'Test Fiction',
-            'description': 'A book for testing Phase 2 email functionality'
+            'description': 'A book for testing Phase 2 email functionality',
+            'total_copies': 10,
+            'available_copies': 10
         }
     )
+    if book.available_copies < 5:
+        book.available_copies = 10
+        book.total_copies = 10
+        book.save()
 
     # Create test transaction with different due dates for testing
     today = timezone.now().date()
@@ -75,7 +79,7 @@ def create_test_data():
         book=book,
         issue_date=today - timedelta(days=10),
         due_date=today + timedelta(days=3),
-        defaults={'status': 'ISSUED'}
+        defaults={'transaction_type': 'ISSUE'}
     )[0]
 
     # Due tomorrow - for firm reminder testing
@@ -84,7 +88,7 @@ def create_test_data():
         book=book,
         issue_date=today - timedelta(days=10),
         due_date=today + timedelta(days=1),
-        defaults={'status': 'ISSUED'}
+        defaults={'transaction_type': 'ISSUE'}
     )[0]
 
     # Due today - for final reminder testing
@@ -93,7 +97,7 @@ def create_test_data():
         book=book,
         issue_date=today - timedelta(days=10),
         due_date=today,
-        defaults={'status': 'ISSUED'}
+        defaults={'transaction_type': 'ISSUE'}
     )[0]
 
     # Overdue 1 day - for overdue warning testing
@@ -102,7 +106,7 @@ def create_test_data():
         book=book,
         issue_date=today - timedelta(days=15),
         due_date=today - timedelta(days=1),
-        defaults={'status': 'ISSUED'}
+        defaults={'transaction_type': 'ISSUE'}
     )[0]
 
     # Overdue 7 days - for escalation testing
@@ -111,7 +115,7 @@ def create_test_data():
         book=book,
         issue_date=today - timedelta(days=20),
         due_date=today - timedelta(days=7),
-        defaults={'status': 'ISSUED'}
+        defaults={'transaction_type': 'ISSUE'}
     )[0]
 
     print("✅ Test data created successfully")
@@ -253,11 +257,8 @@ def test_template_rendering():
 
             # Basic validation checks
             checks = [
-                ('Base template extension', '{% extends "email/base.html" %}' in html_content),
-                ('Subject block', '{% block subject %}' in html_content),
-                ('Content block', '{% block content %}' in html_content),
-                ('Footer block', '{% block footer %}' in html_content),
-                ('User greeting', user.get_full_name() in html_content),
+                ('Base template included', '<!DOCTYPE html>' in html_content),
+                ('User greeting', user.username in html_content),
                 ('Book title', book.title in html_content),
                 ('Responsive design', 'flex' in html_content),
             ]

@@ -26,6 +26,18 @@ class ExtendDueDateForm(forms.Form):
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
 
+    def __init__(self, *args, **kwargs):
+        self.current_due_date = kwargs.pop('current_due_date', None)
+        super().__init__(*args, **kwargs)
+
+    def clean_new_due_date(self):
+        new_due_date = self.cleaned_data['new_due_date']
+        if self.current_due_date and new_due_date <= self.current_due_date:
+            raise ValidationError("New due date must be after the current due date.")
+        if new_due_date <= timezone.now().date():
+            raise ValidationError("New due date must be in the future.")
+        return new_due_date
+
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction

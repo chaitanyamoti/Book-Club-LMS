@@ -7,7 +7,11 @@ class EmailLog(models.Model):
     EMAIL_TYPES = [
         ('WELCOME', 'Welcome Email'),
         ('OVERDUE', 'Overdue Alert'),
+        ('BOOK_ISSUED', 'Book Issued'),
         ('BOOK_RETURNED', 'Book Returned'),
+        ('NEW_BOOK_ALERT', 'New Book Alert'),
+        ('READING_STREAK', 'Reading Streak'),
+        ('BOOKS_READ_MILESTONE', 'Books Read Milestone'),
         ('GENERAL', 'General Notification'),
     ]
 
@@ -19,7 +23,7 @@ class EmailLog(models.Model):
 
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='email_logs')
-    email_type = models.CharField(max_length=20, choices=EMAIL_TYPES)
+    email_type = models.CharField(max_length=40, choices=EMAIL_TYPES)
     subject = models.CharField(max_length=255)
     recipient = models.EmailField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')

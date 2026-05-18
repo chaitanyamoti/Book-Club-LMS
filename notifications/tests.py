@@ -18,11 +18,12 @@ class NotificationsTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertIn('Welcome', msg.subject)
-        self.assertIn('Welcome to the Book Club!', msg.body)
+        self.assertIn('Welcome to Book Club', msg.body)
 
     def test_send_overdue_alerts(self):
         user = User.objects.create_user(username='reader', email='reader@example.com', password='password')
         book = Book.objects.create(title='Overdue Book')
+        mail.outbox = []
         due_date = timezone.now().date() - timezone.timedelta(days=3)
         tx = Transaction.objects.create(user=user, book=book, due_date=due_date)
 
@@ -31,4 +32,4 @@ class NotificationsTests(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
         self.assertIn('Overdue Book Alert', msg.subject)
-        self.assertIn('You have 1 overdue book(s).', msg.body)
+        self.assertIn('borrowed from the Book Club are now overdue', msg.body)

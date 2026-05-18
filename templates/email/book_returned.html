@@ -87,7 +87,7 @@
 <p>We'd love to hear about your reading experience! Your feedback helps us improve our collection.</p>
 
 <div style="text-align: center; margin: 30px 0;">
-    <a href="{% url 'reading:add' %}" class="button" style="background: #28a745;">Log Reading Progress</a>
+    <a href="{% url 'reading:create_reading_log' %}" class="button" style="background: #28a745;">Log Reading Progress</a>
     <a href="{% url 'books:book_list' %}" class="button" style="background: #007bff; margin-left: 10px;">Browse More Books</a>
 </div>
 
@@ -106,7 +106,7 @@
 {% block footer %}
 <p>You're receiving this email because you recently returned a book to our library.</p>
 <p>
-    <a href="{% url 'reading:progress' %}">View Reading Stats</a> |
+    <a href="{% url 'reading:reading_stats' %}">View Reading Stats</a> |
     <a href="{% url 'users:settings' %}">Email Preferences</a>
 </p>
 <p>© 2024 Book Club Manager. All rights reserved.</p>

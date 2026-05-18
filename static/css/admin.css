@@ -1,0 +1,29 @@
+#jazzy-logo .brand-image,
+#jazzy-navbar .brand-image {
+  display: none;
+}
+
+.main-sidebar .user-panel,
+#jazzy-sidebar .user-panel,
+#jazzy-sidebar .nav-header {
+  display: none !important;
+}
+
+#jazzy-logo {
+  justify-content: center;
+  min-height: 56px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+#jazzy-logo .brand-text {
+  display: block;
+  font-weight: 700;
+  margin-left: 0;
+  text-align: center;
+  white-space: normal;
+}
+
+#jazzy-navbar .navbar-nav.ml-auto > .nav-item.dropdown:last-child {
+  display: none;
+}

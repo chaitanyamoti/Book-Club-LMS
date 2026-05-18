@@ -4,23 +4,24 @@ from django.template.response import TemplateResponse # For rendering custom adm
 from django.db.models import Count, Q # For aggregation and complex queries
 from .models import Announcement, UserNotification, EmailLog # Import all models needed
 
-@admin.register(Announcement)
-class AnnouncementAdmin(admin.ModelAdmin):
-    list_display = ('title', 'pub_date', 'is_active', 'display_on_homepage')
-    list_filter = ('is_active', 'display_on_homepage', 'pub_date')
-    search_fields = ('title', 'content')
+# @admin.register(Announcement)
+# class AnnouncementAdmin(admin.ModelAdmin):
+#     list_display = ('title', 'pub_date', 'is_active', 'display_on_homepage')
+#     list_filter = ('is_active', 'display_on_homepage', 'pub_date')
+#     search_fields = ('title', 'content')
 
 @admin.register(UserNotification)
 class UserNotificationAdmin(admin.ModelAdmin):
     list_display = ('user', 'message', 'created_at', 'is_read', 'type', 'link_url')
-    list_filter = ('is_read', 'type', 'created_at')
+    # list_filter = ('is_read', 'type', 'created_at')
     search_fields = ('user__username', 'message')
     fields = ('user', 'message', 'is_read', 'link_url', 'type')
 
 @admin.register(EmailLog)
 class EmailLogAdmin(admin.ModelAdmin):
     list_display = ('user', 'email_type', 'subject', 'recipient', 'status', 'sent_at', 'created_at', 'opened_at', 'ab_test_variant', 'campaign_id')
-    list_filter = ('email_type', 'status', 'ab_test_variant', 'sent_at', 'created_at')
+    list_filter = ('email_type',)
+    # list_filter = ('email_type', 'status', 'ab_test_variant', 'sent_at', 'created_at')
     search_fields = ('user__username', 'recipient', 'subject', 'campaign_id')
     readonly_fields = ('user', 'email_type', 'subject', 'recipient', 'status', 'error_message', 'sent_at', 'created_at', 'email_content', 'opened_at', 'clicked_links', 'user_agent', 'ip_address', 'ab_test_variant', 'campaign_id')
     fields = ('user', 'email_type', 'subject', 'recipient', 'status', 'error_message', 'sent_at', 'created_at', 'email_content', 'opened_at', 'clicked_links', 'user_agent', 'ip_address', 'ab_test_variant', 'campaign_id')

@@ -3,13 +3,15 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 
 from core.models import UserProfile
+from notifications.models import EmailPreference
 
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    """Create a UserProfile whenever a new User is created."""
+    """Create related user records whenever a new User is created."""
     if created:
         UserProfile.objects.create(user=instance)
+        EmailPreference.objects.create(user=instance)
 
 
 @receiver(post_save, sender=User)

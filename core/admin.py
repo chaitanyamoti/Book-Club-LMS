@@ -1,14 +1,31 @@
 from django.contrib import admin
+from django.contrib.admin.sites import NotRegistered
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.template.response import TemplateResponse
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.widgets import ForeignKeyWidget
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django import forms
 
 from .models import Book, Transaction, UserProfile, ReadingLog, BookRequest, ClubSettings
 from transactions.forms import TransactionForm
+
+
+# Hide Django's default Groups section from the admin side panel.
+try:
+    admin.site.unregister(Group)
+except NotRegistered:
+    pass
+
+
+try:
+    admin.site.unregister(User)
+except NotRegistered:
+    pass
 
 
 # Import/export resources
@@ -52,6 +69,43 @@ class BookRequestResource(resources.ModelResource):
         fields = ('id', 'user', 'request_type', 'title', 'author', 'reason', 'status', 'priority', 'created_date')
 
 
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    extra = 0
+    fields = (
+        'phone',
+        'avatar',
+        'role',
+        'reading_preferences',
+        'is_active',
+        'email_overdue_reminders',
+        'email_due_date_alerts',
+        'email_book_returned',
+        'email_new_announcements',
+        'email_weekly_digest',
+        'total_books_read',
+    )
+
+
+@admin.register(User)
+class UserAdmin(DjangoUserAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'profile_link')
+    list_filter = ('is_staff', 'groups')
+    # list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    inlines = (UserProfileInline,)
+
+    def profile_link(self, obj):
+        try:
+            profile = obj.userprofile
+        except UserProfile.DoesNotExist:
+            return '-'
+
+        url = reverse('admin:core_userprofile_change', args=[profile.pk])
+        return format_html('<a href="{}">View profile</a>', url)
+    profile_link.short_description = 'Profile'
+
+
 @admin.register(UserProfile)
 class UserProfileAdmin(ImportExportModelAdmin):
     resource_class = UserProfileResource
@@ -66,7 +120,7 @@ class BookAdmin(ImportExportModelAdmin):
     list_display = ('title', 'author', 'isbn', 'status', 'available_copies', 'qr_code_display', 'added_date')
     list_filter = ('status', 'genre')
     search_fields = ('title', 'author', 'isbn')
-    actions = ('mark_as_lost', 'mark_as_damaged', 'generate_qr_codes', 'bulk_mark_available', 'bulk_update_status')
+    actions = ('mark_as_lost', 'mark_as_damaged', 'generate_qr_codes', 'print_qr_sheet', 'bulk_mark_available', 'bulk_update_status')
     readonly_fields = ('qr_code_display',)
 
     def qr_code_display(self, obj):
@@ -130,6 +184,43 @@ class BookAdmin(ImportExportModelAdmin):
         if failed:
             messages.error(request, f'Failed to generate QR code for: {", ".join(failed)}.')
     generate_qr_codes.short_description = 'Generate QR codes for selected books'
+
+    def print_qr_sheet(self, request, queryset):
+        """Open a printable QR sheet for the selected books."""
+        try:
+            from books.utils import generate_qr_code
+        except ImportError as e:
+            messages.error(request, f'QR generation utility not available: {e}')
+            return
+
+        books = list(queryset.order_by('title', 'id'))
+        generated = 0
+        failed = []
+
+        for book in books:
+            if book.qr_code:
+                continue
+
+            try:
+                generate_qr_code(book)
+                book.save(update_fields=['qr_code'])
+                generated += 1
+            except Exception as e:
+                print(f"ERROR: Could not generate QR code for book {book.id}: {e}")
+                failed.append(book.title)
+
+        if generated > 0:
+            messages.success(request, f'QR code generated for {generated} selected book(s).')
+        if failed:
+            messages.error(request, f'Failed to generate QR code for: {", ".join(failed)}.')
+
+        context = {
+            **self.admin_site.each_context(request),
+            'title': 'Print QR Codes',
+            'books': books,
+        }
+        return TemplateResponse(request, 'admin/core/book/print_qr_sheet.html', context)
+    print_qr_sheet.short_description = 'Print QR sheet for selected books'
 
     def bulk_mark_available(self, request, queryset):
         """Bulk mark selected books as available."""
@@ -205,23 +296,23 @@ class TransactionAdmin(ImportExportModelAdmin):
     send_overdue_reminders.short_description = 'Send overdue reminder emails for selected transactions'
 
 
-@admin.register(ReadingLog)
-class ReadingLogAdmin(ImportExportModelAdmin):
-    resource_class = ReadingLogResource
-    list_display = ('user', 'book', 'log_date', 'progress')
-    list_filter = ('log_date',)
-    search_fields = ('user__username', 'book__title')
+# @admin.register(ReadingLog)
+# class ReadingLogAdmin(ImportExportModelAdmin):
+#     resource_class = ReadingLogResource
+#     list_display = ('user', 'book', 'log_date', 'progress')
+#     list_filter = ('log_date',)
+#     search_fields = ('user__username', 'book__title')
 
 
-@admin.register(BookRequest)
-class BookRequestAdmin(ImportExportModelAdmin):
-    resource_class = BookRequestResource
-    list_display = ('user', 'request_type', 'title', 'status', 'created_date')
-    list_filter = ('request_type', 'status')
-    search_fields = ('title', 'user__username')
+# @admin.register(BookRequest)
+# class BookRequestAdmin(ImportExportModelAdmin):
+#     resource_class = BookRequestResource
+#     list_display = ('user', 'request_type', 'title', 'status', 'created_date')
+#     list_filter = ('request_type', 'status')
+#     search_fields = ('title', 'user__username')
 
 
-@admin.register(ClubSettings)
-class ClubSettingsAdmin(admin.ModelAdmin):
-    list_display = ('setting_key', 'setting_value', 'updated_at')
-    search_fields = ('setting_key',)
+# @admin.register(ClubSettings)
+# class ClubSettingsAdmin(admin.ModelAdmin):
+#     list_display = ('setting_key', 'setting_value', 'updated_at')
+#     search_fields = ('setting_key',)

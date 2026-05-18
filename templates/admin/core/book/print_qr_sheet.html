@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+  .qr-toolbar {
+    margin: 0 0 20px;
+  }
+
+  .qr-sheet {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .qr-card {
+    border: 1px solid #d8d8d8;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .qr-card img {
+    height: 130px;
+    object-fit: contain;
+    width: 130px;
+  }
+
+  .qr-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 8px 0 2px;
+  }
+
+  .qr-meta {
+    color: #555;
+    font-size: 11px;
+    margin: 0;
+  }
+
+  @media print {
+    #header,
+    .breadcrumbs,
+    .qr-toolbar {
+      display: none;
+    }
+
+    #content {
+      margin: 0;
+      padding: 0;
+    }
+
+    .qr-sheet {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .qr-card {
+      border-color: #000;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="qr-toolbar">
+  <button type="button" class="button default" onclick="window.print()">Print QR Sheet</button>
+  <a class="button" href="{% url 'admin:core_book_changelist' %}">Back to Books</a>
+</div>
+
+<div class="qr-sheet">
+  {% for book in books %}
+    <div class="qr-card">
+      {% if book.qr_code %}
+        <img src="{{ book.qr_code.url }}" alt="QR code for {{ book.title }}">
+      {% else %}
+        <p class="qr-meta">QR not available</p>
+      {% endif %}
+      <p class="qr-title">{{ book.title }}</p>
+      <p class="qr-meta">{{ book.author }}</p>
+      <p class="qr-meta">Book ID: {{ book.id }}</p>
+    </div>
+  {% empty %}
+    <p>No books were selected.</p>
+  {% endfor %}
+</div>
+
+<script>
+  window.addEventListener('load', function() {
+    window.print();
+  });
+</script>
+{% endblock %}

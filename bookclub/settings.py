@@ -176,7 +176,7 @@ if EMAIL_BACKEND_TYPE == "smtp":
 
     if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
         EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-        EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.gmail.com")
+        EMAIL_HOST = os.environ.get("EMAIL_HOST", "sandbox.smtp.mailtrap.io")
         EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
         EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True") == "True"
         print("DEBUG: Using SMTP backend with credentials")
@@ -227,21 +227,29 @@ if not DEBUG:
 
 # JAZZMIN SETTINGS (Modern Admin Theme)
 JAZZMIN_SETTINGS = {
-    "site_title": "Book Club Admin",
-    "site_header": "Book Club",
-    "site_brand": "📚 Book Club",
-    "site_logo": "images/logo.png",
-    "welcome_sign": "Welcome to Book Club Admin Panel",
-    "copyright": "Book Club Manager",
+    "site_title": "Beyond the Pages Admin",
+    "site_header": "Beyond the Pages",
+    "site_brand": "Beyond the Pages",
+    "site_logo": None,
+    "welcome_sign": "Welcome to Beyond the Pages Admin Panel",
+    "copyright": "Beyond the Pages",
             "search_model": ["auth.User", "core.Book"],    "user_avatar": None,
     "topmenu_links": [
         {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "Home", "url": "core:home", "new_window": False},
     ],
+    "usermenu_links": [
+        {"model": "notifications.EmailLog"},
+        {"model": "notifications.UserNotification"},
+    ],
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
-    "hide_models": [],
+    "hide_models": [
+        "core.UserProfile",
+        "notifications.EmailLog",
+        "notifications.UserNotification",
+    ],
     "order_with_respect_to": ["auth", "core", "transactions", "reading", "bookrequests", "notifications", "users"],
     "apps": {
         "core": {
@@ -293,8 +301,8 @@ JAZZMIN_SETTINGS = {
     "default_icon_parents": "fas fa-chevron-circle-right",
     "default_icon_children": "fas fa-circle",
     "related_modal_active": True,
-    "custom_css": None,
-    "custom_js": None,
+    "custom_css": "css/admin.css",
+    "custom_js": "js/admin.js",
     "show_ui_builder": False,
     "changeform_format": "horizontal_tabs",
     "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},

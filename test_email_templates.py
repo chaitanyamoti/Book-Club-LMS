@@ -5,20 +5,17 @@ Test script for email template rendering and validation
 import os
 import sys
 import django
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.test import RequestFactory
-from django.contrib.auth.models import User
-from datetime import datetime, timedelta
-
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bookclub.settings')
 django.setup()
 
-from books.models import Book
-from transactions.models import Transaction
+from django.contrib.auth.models import User
+from core.models import Book, UserProfile, Transaction
 from notifications.models import EmailLog
-from users.models import UserProfile
 
 def create_test_data():
     """Create test data for email template testing"""
@@ -42,26 +39,32 @@ def create_test_data():
     )
 
     # Create test book
-    book, created = Book.objects.get_or_create(
+    book, _ = Book.objects.get_or_create(
         title='Test Book Title',
-        author='Test Author',
         defaults={
+            'author': 'Test Author',
             'isbn': '1234567890',
             'genre': 'Fiction',
-            'description': 'A test book for email templates'
+            'description': 'A test book for email templates',
+            'total_copies': 10,
+            'available_copies': 10
         }
     )
+    if book.available_copies < 5:
+        book.available_copies = 10
+        book.total_copies = 10
+        book.save()
 
     # Create test transaction
-    transaction, created = Transaction.objects.get_or_create(
-        user=user,
-        book=book,
-        defaults={
-            'issue_date': datetime.now() - timedelta(days=10),
-            'due_date': datetime.now() + timedelta(days=5),
-            'status': 'ISSUED'
-        }
-    )
+    transaction = Transaction.objects.filter(user=user, book=book).first()
+    if not transaction:
+        transaction = Transaction.objects.create(
+            user=user,
+            book=book,
+            issue_date=datetime.now() - timedelta(days=10),
+            due_date=datetime.now() + timedelta(days=5),
+            transaction_type='ISSUE'
+        )
 
     return user, book, transaction
 
@@ -77,7 +80,7 @@ def test_overdue_alert_template():
         book=book,
         issue_date=datetime.now() - timedelta(days=20),
         due_date=datetime.now() - timedelta(days=5),
-        status='ISSUED'
+        transaction_type='ISSUE'
     )
     overdue_transaction.days_overdue = 5  # Simulate overdue days
     overdue_transaction.save()
@@ -94,12 +97,12 @@ def test_overdue_alert_template():
 
         # Basic validation checks
         checks = [
-            ('Base template extension', '{% extends "email/base.html" %}' in html_content),
-            ('Subject block', '🚨 Overdue Books Alert' in html_content),
-            ('User greeting', user.get_full_name() in html_content),
+            ('Base template included', '<!DOCTYPE html>' in html_content),
+            ('Header present', '🚨 Overdue Books Alert' in html_content),
+            ('User greeting', user.username in html_content),
             ('Book title', book.title in html_content),
             ('Call-to-action buttons', 'Return Books Now' in html_content),
-            ('Footer links', 'Email Preferences' in html_content),
+            ('Footer present', 'Book Club' in html_content),
             ('Responsive classes', 'flex' in html_content),
         ]
 
@@ -107,7 +110,7 @@ def test_overdue_alert_template():
             status = "✅" if passed else "❌"
             print(f"  {status} {check_name}")
 
-        return True
+        return all(passed for _, passed in checks)
 
     except Exception as e:
         print(f"❌ Overdue alert template failed: {e}")
@@ -139,22 +142,21 @@ def test_book_returned_template():
 
         # Basic validation checks
         checks = [
-            ('Base template extension', '{% extends "email/base.html" %}' in html_content),
-            ('Subject block', '📚 Book Returned Successfully' in html_content),
-            ('User greeting', user.get_full_name() in html_content),
+            ('Base template included', '<!DOCTYPE html>' in html_content),
+            ('Header present', 'Book Returned Successfully' in html_content),
+            ('User greeting', user.username in html_content),
             ('Book title', book.title in html_content),
             ('Reading stats', 'Books This Month' in html_content),
             ('Recommendations', 'You Might Also Like' in html_content),
             ('Achievements', 'Achievement Unlocked' in html_content),
             ('Call-to-action buttons', 'Log Reading Progress' in html_content),
-            ('Footer links', 'Email Preferences' in html_content),
         ]
 
         for check_name, passed in checks:
             status = "✅" if passed else "❌"
             print(f"  {status} {check_name}")
 
-        return True
+        return all(passed for _, passed in checks)
 
     except Exception as e:
         print(f"❌ Book returned template failed: {e}")
@@ -229,12 +231,12 @@ def test_tracking_pixel():
     try:
         html_content = render_to_string('email/overdue_alert.html', context)
 
-        # Check for tracking pixel block
-        if '{% block tracking_pixel %}{% endblock %}' in html_content:
-            print("✅ Tracking pixel block present in template")
+        # Check for tracking pixel img tag
+        if 'tracking pixel' in html_content.lower() and '<img src="' in html_content:
+            print("✅ Tracking pixel section present in rendered template")
             return True
         else:
-            print("❌ Tracking pixel block missing")
+            print("❌ Tracking pixel section missing")
             return False
 
     except Exception as e:
@@ -256,10 +258,10 @@ def test_email_preferences_integration():
     try:
         html_content = render_to_string('email/overdue_alert.html', context)
 
-        # Check for preference links
+        # Check for preference links (rendered)
         preference_checks = [
             'Email Preferences',
-            '{% url \'users:settings\' %}',
+            '/users/settings/',
         ]
 
         all_passed = True

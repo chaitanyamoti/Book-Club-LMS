@@ -241,7 +241,7 @@ class TransactionEmailService:
         """
         # Simple recommendation: books not read by user, ordered by popularity
         # In production, this would consider reading history, genres, ratings, etc.
-        user_read_books = user.transactions.filter(status__in=['RETURNED', 'ISSUED']).values_list('book_id', flat=True)
+        user_read_books = user.transaction_set.filter(transaction_type__in=['RETURN', 'ISSUE']).values_list('book_id', flat=True)
 
         recommendations = Book.objects.exclude(
             id__in=user_read_books

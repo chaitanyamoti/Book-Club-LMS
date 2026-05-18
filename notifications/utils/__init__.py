@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from django.utils import timezone
 from core.models import Transaction, Book
-from .models import UserNotification, EmailLog
+from ..models import UserNotification, EmailLog
 
 
 def send_welcome_email(user):

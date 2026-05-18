@@ -31,7 +31,7 @@ class BookModelTests(TestCase):
 class TransactionModelTests(TestCase):
     def test_is_overdue_true_when_due_passed_and_not_returned(self):
         user = User.objects.create_user(username='u2', password='p')
-        book = Book.objects.create(title='T2', author='A2', added_by=user, total_copies=1, available_copies=0)
+        book = Book.objects.create(title='T2', author='A2', added_by=user, total_copies=1, available_copies=1)
         due = timezone.now().date() - datetime.timedelta(days=5)
         trans = Transaction.objects.create(
             book=book, user=user, transaction_type='ISSUE', due_date=due, created_by=user
