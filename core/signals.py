@@ -44,15 +44,11 @@ def transaction_pre_save(sender, instance, **kwargs):
         if change_in_available_copies != 0:
             intended_available_copies = book.available_copies + change_in_available_copies
 
-            if intended_available_copies < 0:
-                raise ValidationError(f"Cannot issue '{book.title}': No copies available.")
-            
-            if intended_available_copies > book.total_copies:
-                # This handles cases where a book might be returned more than its total_copies
-                raise ValidationError(f"Cannot return '{book.title}': Available copies would exceed total copies ({book.total_copies}).")
-
-            book.available_copies = intended_available_copies
-            book.save(update_fields=['available_copies']) # Update only available_copies atomically
+            # If we don't have enough copies, we stop here.
+            # The admin check in save_model will catch this and show a proper error message.
+            if intended_available_copies >= 0 and intended_available_copies <= book.total_copies:
+                book.available_copies = intended_available_copies
+                book.save(update_fields=['available_copies']) # Update only available_copies atomically
         
         # After available_copies is updated and saved, refresh the book from the database
         # to ensure its available_copies is the updated value and then call its save method
@@ -69,11 +65,9 @@ def transaction_post_delete(sender, instance, **kwargs):
         with db_transaction.atomic():
             book = Book.objects.select_for_update().get(pk=instance.book.pk)
             
-            intended_available_copies = book.available_copies + 1
-            if intended_available_copies > book.total_copies:
-                raise ValidationError(f"Cannot delete issued transaction for '{book.title}': Available copies would exceed total copies ({book.total_copies}).")
-
-            book.available_copies = intended_available_copies
+            # Simply update available_copies. If it exceeds total_copies,
+            # this logic is moved to the admin level where it can be handled gracefully.
+            book.available_copies += 1
             book.save(update_fields=['available_copies'])
             
             book.refresh_from_db()

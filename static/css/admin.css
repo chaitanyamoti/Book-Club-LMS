@@ -1,27 +1,133 @@
-#jazzy-logo .brand-image,
-#jazzy-navbar .brand-image {
-  display: none;
-}
-
-.main-sidebar .user-panel,
-#jazzy-sidebar .user-panel,
-#jazzy-sidebar .nav-header {
-  display: none !important;
-}
-
 #jazzy-logo {
   justify-content: center;
   min-height: 56px;
   padding-left: 12px;
   padding-right: 12px;
+  display: flex !important;
+  align-items: center;
+}
+
+#jazzy-logo .brand-image {
+  max-height: 40px !important;
+  width: auto !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 #jazzy-logo .brand-text {
-  display: block;
+  display: inline-block !important;
   font-weight: 700;
-  margin-left: 0;
-  text-align: center;
-  white-space: normal;
+  margin-left: 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Login Page Logo Styling */
+.login-logo, .login-box .login-logo {
+    display: flex !important;
+    justify-content: center !important;
+    margin-bottom: 20px !important;
+}
+
+.login-logo img, .login-box .login-logo img {
+    max-width: 150px !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
+}
+
+/* CSV Import Preview Table Fix */
+.import-preview-table, 
+.table-responsive .table,
+div[id^="import-preview"] table,
+.import-preview table {
+    background-color: white !important;
+    color: #333 !important;
+}
+
+.import-preview-table th, 
+.import-preview-table td,
+.import-preview table th,
+.import-preview table td {
+    border: 1px solid #dee2e6 !important;
+    padding: 8px !important;
+    color: #333 !important;
+    background-color: white !important;
+}
+
+.import-preview-table thead th,
+.import-preview table thead th {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+/* Fix for "black boxes" - ensure text inside cells is visible */
+.import-preview table td span,
+.import-preview table td div,
+.import-preview table td code {
+    color: #212529 !important;
+    background-color: transparent !important;
+}
+
+/* Force light theme for any table in the main content area that looks like a preview */
+.content-wrapper table.table-striped,
+.content-wrapper table.table-bordered,
+.content-wrapper .table,
+.content-wrapper .import-preview,
+.content-wrapper table {
+    background-color: white !important;
+    color: #212529 !important;
+}
+
+/* Fix the specific "dark purple" or striped rows and ensure text is visible */
+.content-wrapper table tbody tr,
+.content-wrapper table tbody td,
+.content-wrapper table thead th,
+.content-wrapper table.table-striped tbody tr:nth-of-type(odd),
+.content-wrapper table.table-hover tbody tr:hover {
+    background-color: white !important;
+    color: #212529 !important;
+    border-color: #dee2e6 !important;
+}
+
+
+/* Ensure no inner spans or divs have dark backgrounds making it look redacted */
+.content-wrapper table td *,
+.content-wrapper table th * {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+/* Force Light Mode on Admin Cards and Forms */
+.content-wrapper, 
+.content-wrapper .card, 
+.content-wrapper .card-body,
+.content-wrapper .card-header,
+.content-wrapper fieldset,
+.content-wrapper .form-row {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border-color: #dee2e6 !important;
+}
+
+.content-wrapper label,
+.content-wrapper .help-block,
+.content-wrapper p,
+.content-wrapper h1,
+.content-wrapper h2,
+.content-wrapper h3 {
+    color: #212529 !important;
+}
+
+/* Specific fix for the import page container */
+body.app-core.model-book.action-import .content-wrapper,
+body.app-core.model-book.action-import .card {
+    background-color: #f4f6f9 !important;
+}
+
+body.app-core.model-book.action-import .card-body {
+    background-color: #ffffff !important;
 }
 
 #jazzy-navbar .navbar-nav.ml-auto > .nav-item.dropdown:last-child {

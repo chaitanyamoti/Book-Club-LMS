@@ -1,4 +1,10 @@
 (function () {
+  // Fix "django is not defined" error for third-party plugins
+  window.django = window.django || {};
+  if (typeof jQuery !== 'undefined' && !window.django.jQuery) {
+    window.django.jQuery = jQuery;
+  }
+
   function getCsrfToken() {
     var tokenInput = document.querySelector('#logout-form input[name="csrfmiddlewaretoken"]');
     return tokenInput ? tokenInput.value : '';

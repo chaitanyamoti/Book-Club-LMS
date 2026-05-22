@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
@@ -230,7 +230,9 @@ JAZZMIN_SETTINGS = {
     "site_title": "Beyond the Pages Admin",
     "site_header": "Beyond the Pages",
     "site_brand": "Beyond the Pages",
-    "site_logo": None,
+    "site_logo": "images/logo.png",
+    "login_logo": "images/logo.png",
+    "site_icon": "images/logo.png",
     "welcome_sign": "Welcome to Beyond the Pages Admin Panel",
     "copyright": "Beyond the Pages",
             "search_model": ["auth.User", "core.Book"],    "user_avatar": None,

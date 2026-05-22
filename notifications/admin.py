@@ -34,37 +34,43 @@ class EmailLogAdmin(admin.ModelAdmin):
         return my_urls + urls
 
     def email_analytics_view(self, request):
-        # Overall Stats
-        total_emails_sent = EmailLog.objects.filter(status='SENT').count()
-        total_emails_opened = EmailLog.objects.filter(opened_at__isnull=False).count()
-        overall_open_rate = (total_emails_opened / total_emails_sent * 100) if total_emails_sent > 0 else 0
+        try:
+            # Overall Stats
+            total_emails_sent = EmailLog.objects.filter(status='SENT').count()
+            total_emails_opened = EmailLog.objects.filter(opened_at__isnull=False).count()
+            overall_open_rate = (total_emails_opened / total_emails_sent * 100) if total_emails_sent > 0 else 0
 
-        # Analytics by Email Type
-        analytics_by_type = EmailLog.objects.values('email_type').annotate(
-            sent_count=Count('pk', filter=Q(status='SENT')),
-            opened_count=Count('pk', filter=Q(status='SENT', opened_at__isnull=False))
-        ).order_by('email_type')
-        
-        for item in analytics_by_type:
-            item['open_rate'] = (item['opened_count'] / item['sent_count'] * 100) if item['sent_count'] > 0 else 0
+            # Analytics by Email Type
+            analytics_by_type = EmailLog.objects.values('email_type').annotate(
+                sent_count=Count('pk', filter=Q(status='SENT')),
+                opened_count=Count('pk', filter=Q(status='SENT', opened_at__isnull=False))
+            ).order_by('email_type')
+            
+            for item in analytics_by_type:
+                item['open_rate'] = (item['opened_count'] / item['sent_count'] * 100) if item['sent_count'] > 0 else 0
 
-        # Analytics by A/B Test Variant
-        analytics_by_variant = EmailLog.objects.values('campaign_id', 'ab_test_variant').annotate(
-            sent_count=Count('pk', filter=Q(status='SENT')),
-            opened_count=Count('pk', filter=Q(status='SENT', opened_at__isnull=False))
-        ).order_by('campaign_id', 'ab_test_variant')
+            # Analytics by A/B Test Variant
+            analytics_by_variant = EmailLog.objects.values('campaign_id', 'ab_test_variant').annotate(
+                sent_count=Count('pk', filter=Q(status='SENT')),
+                opened_count=Count('pk', filter=Q(status='SENT', opened_at__isnull=False))
+            ).order_by('campaign_id', 'ab_test_variant')
 
-        for item in analytics_by_variant:
-            item['open_rate'] = (item['opened_count'] / item['sent_count'] * 100) if item['sent_count'] > 0 else 0
+            for item in analytics_by_variant:
+                item['open_rate'] = (item['opened_count'] / item['sent_count'] * 100) if item['sent_count'] > 0 else 0
 
 
-        context = dict(
-            self.admin_site.each_context(request),
-            title="Email Analytics Dashboard",
-            total_emails_sent=total_emails_sent,
-            total_emails_opened=total_emails_opened,
-            overall_open_rate=f"{overall_open_rate:.2f}",
-            analytics_by_type=analytics_by_type,
-            analytics_by_variant=analytics_by_variant,
-        )
-        return TemplateResponse(request, "notifications/admin/email_analytics.html", context)
+            context = dict(
+                self.admin_site.each_context(request),
+                title="Email Analytics Dashboard",
+                total_emails_sent=total_emails_sent,
+                total_emails_opened=total_emails_opened,
+                overall_open_rate=f"{overall_open_rate:.2f}",
+                analytics_by_type=analytics_by_type,
+                analytics_by_variant=analytics_by_variant,
+            )
+            return TemplateResponse(request, "notifications/admin/email_analytics.html", context)
+        except Exception as e:
+            from django.contrib import messages
+            from django.http import HttpResponseRedirect
+            messages.error(request, f"Error generating analytics: {str(e)}")
+            return HttpResponseRedirect("../") # Redirect back to EmailLog changelist

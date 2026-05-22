@@ -46,3 +46,18 @@ class TransactionForm(forms.ModelForm):
             'due_date': forms.DateInput(attrs={'type': 'date'}),
             'return_date': forms.DateInput(attrs={'type': 'date'}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        book = cleaned_data.get('book')
+        transaction_type = cleaned_data.get('transaction_type')
+        return_date = cleaned_data.get('return_date')
+
+        # Check availability for new issues or if changing to an issue
+        if transaction_type == 'ISSUE' and not return_date:
+            if book and book.available_copies <= 0:
+                # If this is a new transaction (not an edit of an existing ISSUE)
+                if not self.instance.pk or self.instance.transaction_type != 'ISSUE':
+                    raise ValidationError(f"Cannot issue '{book.title}': No copies available.")
+        
+        return cleaned_data
