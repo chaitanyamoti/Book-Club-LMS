@@ -85,8 +85,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'bookclub.wsgi.application'
 
 # DATABASE - SQLite for dev, PostgreSQL for production
-import dj_database_url
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -96,6 +94,7 @@ DATABASES = {
 
 # Update database configuration from DATABASE_URL environment variable
 if os.environ.get('DATABASE_URL'):
+    import dj_database_url
     DATABASES['default'] = dj_database_url.config(
         conn_max_age=600,
         ssl_require=True
