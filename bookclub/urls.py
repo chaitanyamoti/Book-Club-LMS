@@ -48,7 +48,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     
     # Explicitly serve media files in production (Render Free Tier workaround)
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
 # Serve static and media in development

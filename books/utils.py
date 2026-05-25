@@ -44,6 +44,15 @@ def generate_qr_code(book):
     # Create filename
     filename = f"qr_book_{book.id}.png"
 
+    # Delete existing file if it exists to avoid suffixes like _abc123
+    if book.qr_code:
+        try:
+            # We don't want to delete from storage because it might be empty on Render,
+            # but we want Django to overwrite the field cleanly.
+            book.qr_code.delete(save=False)
+        except:
+            pass
+
     # Save to Django file field
     book.qr_code.save(filename, ContentFile(buffer.getvalue()), save=False)
 
