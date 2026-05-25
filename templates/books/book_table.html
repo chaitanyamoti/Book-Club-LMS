@@ -44,11 +44,7 @@
               <td contenteditable="true">{{ b.available_copies }}</td>
               <td contenteditable="true">{{ b.status }}</td>
               <td>
-                {% if b.qr_code %}
-                  <img src="{{ b.qr_code.url }}" alt="QR code for {{ b.title }}" class="img-fluid rounded" style="max-width: 50px; max-height: 50px;">
-                {% else %}
-                  <span class="text-muted small">No QR</span>
-                {% endif %}
+                <img src="{% url 'books:generate_qr' b.id %}" alt="QR code for {{ b.title }}" class="img-fluid rounded" style="max-width: 50px; max-height: 50px;">
               </td>
               <td>
                 <a href="{% url 'books:book_edit' b.id %}" class="btn btn-sm btn-primary">
@@ -107,12 +103,7 @@
                 <div class="col-6">
                   <strong>QR Code:</strong>
                   <div class="d-flex align-items-center">
-                    {% if b.qr_code %}
-                      <img src="{{ b.qr_code.url }}" alt="QR code for {{ b.title }}" class="img-fluid rounded me-2" style="max-width: 40px; max-height: 40px;">
-                      <small class="text-success">Available</small>
-                    {% else %}
-                      <small class="text-muted">No QR</small>
-                    {% endif %}
+                    <img src="{% url 'books:generate_qr' b.id %}" alt="QR code for {{ b.title }}" class="img-fluid rounded me-2" style="max-width: 40px; max-height: 40px;">
                   </div>
                 </div>
               </div>

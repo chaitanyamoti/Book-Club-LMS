@@ -42,10 +42,8 @@
 <div style="display: flex; justify-content: space-around; margin: 20px 0;">
     <div style="text-align: center;">
         <p><strong>📱 Quick Return</strong></p>
-        {% if transaction.book.qr_code %}
-        <img src="{{ transaction.book.qr_code.url }}" alt="QR Code" style="width: 80px; height: 80px;">
+        <img src="{{ transaction.book.dynamic_qr_url }}" alt="QR Code" style="width: 80px; height: 80px;">
         <p>Scan QR code</p>
-        {% endif %}
     </div>
     <div style="text-align: center;">
         <p><strong>💻 Online Return</strong></p>

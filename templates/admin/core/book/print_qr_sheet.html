@@ -72,11 +72,7 @@
 <div class="qr-sheet">
   {% for book in books %}
     <div class="qr-card">
-      {% if book.qr_code %}
-        <img src="{{ book.qr_code.url }}" alt="QR code for {{ book.title }}">
-      {% else %}
-        <p class="qr-meta">QR not available</p>
-      {% endif %}
+      <img src="{% url 'books:generate_qr' book.id %}" alt="QR code for {{ book.title }}">
       <p class="qr-title">{{ book.title }}</p>
       <p class="qr-meta">{{ book.author }}</p>
       <p class="qr-meta">Book ID: {{ book.id }}</p>

@@ -126,6 +126,18 @@ class Book(models.Model):
     available_copies = models.IntegerField(default=1, validators=[MinValueValidator(0)])
     currently_out = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
+    @property
+    def dynamic_qr_url(self):
+        """Returns the absolute URL for the dynamic QR code generation."""
+        from django.urls import reverse
+        from django.conf import settings
+        path = reverse('books:generate_qr', args=[self.id])
+        domain = getattr(settings, 'RENDER_EXTERNAL_HOSTNAME', None)
+        if domain:
+            return f"https://{domain}{path}"
+        # Fallback for development (might be relative or localhost)
+        return path
+
     def __str__(self):
         return f"{self.title} by {self.author}"
 

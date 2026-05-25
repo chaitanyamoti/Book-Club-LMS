@@ -36,7 +36,7 @@ def admin_login_redirect(request):
 admin.site.login = admin_login_redirect
 
 urlpatterns = [
-    path('', lambda request: redirect('core:dashboard', permanent=False)),
+    path('', lambda request: redirect('admin/', permanent=False)),
     path('admin/', admin.site.urls),
     path('', include('core.urls', namespace='core')),
     path('users/', include('users.urls', namespace='users')),

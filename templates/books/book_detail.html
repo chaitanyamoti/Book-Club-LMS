@@ -11,9 +11,7 @@
       <p>{{ book.description }}</p>
     </div>
     <div class="col-md-4">
-      {% if book.qr_code %}
-      <img src="{{ book.qr_code.url }}" alt="QR code" class="img-fluid">
-      {% endif %}
+      <img src="{% url 'books:generate_qr' book.id %}" alt="QR code" class="img-fluid">
     </div>
   </div>
 </div>

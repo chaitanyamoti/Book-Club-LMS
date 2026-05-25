@@ -202,9 +202,8 @@ class BookAdmin(FriendlyImportExportMixin, ImportExportModelAdmin):
 
     def qr_code_display(self, obj):
         """Display QR code as image in admin list view."""
-        if obj.qr_code:
-            return mark_safe(f'<img src="{obj.qr_code.url}" alt="QR code" style="max-width: 50px; max-height: 50px;">')
-        return 'No QR'
+        url = reverse('books:generate_qr', args=[obj.id])
+        return mark_safe(f'<img src="{url}" alt="QR code" style="max-width: 50px; max-height: 50px;">')
     qr_code_display.short_description = 'QR Code'
 
     def save_model(self, request, obj, form, change):

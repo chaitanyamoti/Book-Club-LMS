@@ -9,8 +9,42 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
-import json, csv
+import json, csv, qrcode
+from io import BytesIO
 from .forms import BookForm
+
+
+@login_required
+def generate_qr_view(request, book_id):
+    """Generate a QR code on the fly and return it as an image response."""
+    book = get_object_or_404(Book, id=book_id)
+    
+    # Generate the absolute URL for the transaction page
+    path = reverse_lazy('transactions:scan_and_transact', args=[book.id])
+    
+    from django.conf import settings
+    domain = getattr(settings, 'RENDER_EXTERNAL_HOSTNAME', None)
+    if domain:
+        url = f"https://{domain}{path}"
+    else:
+        # Get host from request if not on Render
+        url = request.build_absolute_uri(path)
+    
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    
+    return HttpResponse(buffer.getvalue(), content_type="image/png")
 
 
 @method_decorator(login_required(login_url='users:login'), name='dispatch')
