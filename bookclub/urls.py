@@ -15,11 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import redirect
+from django.views.static import serve
 
 # Store the original admin login view
 original_admin_login = admin.site.login
@@ -35,7 +36,7 @@ def admin_login_redirect(request):
 admin.site.login = admin_login_redirect
 
 urlpatterns = [
-    path('', lambda request: redirect('admin/', permanent=False)),
+    path('', lambda request: redirect('core:dashboard', permanent=False)),
     path('admin/', admin.site.urls),
     path('', include('core.urls', namespace='core')),
     path('users/', include('users.urls', namespace='users')),
@@ -45,9 +46,11 @@ urlpatterns = [
     path('requests/', include('bookrequests.urls', namespace='bookrequests')),
     path('notifications/', include('notifications.urls', namespace='notifications')),
     path('accounts/', include('django.contrib.auth.urls')),
+    
+    # Explicitly serve media files in production (Render Free Tier workaround)
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
 
 # Serve static and media in development
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
