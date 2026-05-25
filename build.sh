@@ -8,7 +8,7 @@ pip install -r requirements.txt
 # Collect static files
 python manage.py collectstatic --no-input
 
-# Run migrations
+# Run migrations (This will also load initial data from JSON)
 python manage.py migrate
 
 # Create media directories

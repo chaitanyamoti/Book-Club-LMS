@@ -1,0 +1,238 @@
+[
+  {
+    "no": "1.0",
+    "book name": "Strategic Brand Management",
+    "author": "Sharadh Sharin",
+    "employe name": "Saurav"
+  },
+  {
+    "no": "2.0",
+    "book name": "Body The Greatest Gadget",
+    "author": "Sadhguru",
+    "employe name": "Pankaj Dhoran"
+  },
+  {
+    "no": "3.0",
+    "book name": "Zero To One",
+    "author": "Peter Thiel",
+    "employe name": "Pratiksha Kulkarni"
+  },
+  {
+    "no": "4.0",
+    "book name": "UML Distilled",
+    "author": "Marthin Fowler"
+  },
+  {
+    "no": "5.0",
+    "book name": "The Kite Runner",
+    "author": "Khaled Hosseini"
+  },
+  {
+    "no": "6.0",
+    "book name": "The Phoneik Project",
+    "author": "Gena KIm"
+  },
+  {
+    "no": "7.0",
+    "book name": "Practical Object-Oriented",
+    "author": "Maek Priestley"
+  },
+  {
+    "no": "8.0",
+    "book name": "Rome Florence Venice Naples"
+  },
+  {
+    "no": "9.0",
+    "book name": "Management Sience",
+    "author": "Mark S Hillier"
+  },
+  {
+    "no": "10.0",
+    "book name": "C++ Primer Plus"
+  },
+  {
+    "no": "11.0",
+    "book name": "Sherlock Holmes 1",
+    "author": "Sir Arthur"
+  },
+  {
+    "no": "12.0",
+    "book name": "Sherlock Holmes 2",
+    "author": "Sir Arthur"
+  },
+  {
+    "no": "13.0",
+    "book name": "The Wimwiam 1"
+  },
+  {
+    "no": "14.0",
+    "book name": "The Wimwiam 2"
+  },
+  {
+    "no": "15.0",
+    "book name": "The Wimwian 3"
+  },
+  {
+    "no": "16.0",
+    "book name": "Akshadhara"
+  },
+  {
+    "no": "17.0",
+    "book name": "Nenny Lenny a Penny More Not a Penny Less"
+  },
+  {
+    "no": "18.0",
+    "book name": "Atomic Habits",
+    "author": "James Clear"
+  },
+  {
+    "no": "19.0",
+    "book name": "Crossing The Chasm",
+    "author": "Geoffey Moore"
+  },
+  {
+    "no": "20.0",
+    "book name": "The Unicrn Project",
+    "author": "Gene Kim"
+  },
+  {
+    "no": "21.0",
+    "book name": "The Great Gatsby",
+    "author": "Scott Fitzgerald"
+  },
+  {
+    "no": "22.0",
+    "book name": "My Sol"
+  },
+  {
+    "no": "23.0",
+    "book name": "Ardroid Sensor Programming",
+    "author": "Greg Milette"
+  },
+  {
+    "no": "24.0",
+    "book name": "Kiigai"
+  },
+  {
+    "no": "25.0",
+    "book name": "Let,s Talk Mony",
+    "author": "Monika Halan"
+  },
+  {
+    "no": "26.0",
+    "book name": "Emecergen of The Me Enterpra ise",
+    "author": "Ashok Shah"
+  },
+  {
+    "no": "27.0",
+    "book name": "The World`s Most Mysterious Places",
+    "author": "The Reader Digest Association"
+  },
+  {
+    "no": "28.0",
+    "book name": "Nature`s Masterpieces",
+    "author": "The Reader Digest Association"
+  },
+  {
+    "no": "29.0",
+    "book name": "Shoe Dog Phil Knight",
+    "author": "Rohan Silva"
+  },
+  {
+    "no": "30.0",
+    "book name": "Invested or Rat Race Trappedd ?",
+    "author": "Ashish Bhave"
+  },
+  {
+    "no": "31.0",
+    "book name": "The Secret of Chimneys",
+    "author": "Asatha Christie"
+  },
+  {
+    "no": "32.0",
+    "book name": "Jane Eyre",
+    "author": "Charlotte Bronte"
+  },
+  {
+    "no": "33.0",
+    "book name": "Their eyes Were Watching God",
+    "author": "Zora Neale Hurston"
+  },
+  {
+    "no": "34.0",
+    "book name": "Nothing Lasts Forever",
+    "author": "Sidney Sheldon ' A master storyteller' DAILY MAIL"
+  },
+  {
+    "no": "35.0",
+    "book name": "The Murder of Roger Ackroyd",
+    "author": "Asatha Christie"
+  },
+  {
+    "no": "36.0",
+    "book name": "The Great Gatsby",
+    "author": "F.Scott Fitzgerald"
+  },
+  {
+    "no": "37.0",
+    "book name": "Ural Sural",
+    "author": "P.L Deshpande"
+  },
+  {
+    "no": "38.0",
+    "book name": "Aghal Paghal",
+    "author": "P.L Deshpande"
+  },
+  {
+    "no": "39.0",
+    "book name": "Don`t Believe Everything You Think",
+    "author": "Joseph Nguyen",
+    "employe name": "Amey Medewar",
+    "return date": "2026-02-06 00:00:00"
+  },
+  {
+    "no": "40.0",
+    "book name": "Money wise",
+    "author": "Deepak Shenoy",
+    "employe name": "Vedant Umale"
+  },
+  {
+    "no": "41.0",
+    "book name": "The Psychology of Money",
+    "author": "Morgan Housel",
+    "employe name": "Shreya Kore"
+  },
+  {
+    "no": "42.0",
+    "book name": "The Startup Of You",
+    "author": "Reid Hoffman & Ben Casnocha",
+    "employe name": "Pranav Dhumale"
+  },
+  {
+    "no": "43.0",
+    "book name": "Discover Your Destiny",
+    "author": "Robin Sharma",
+    "employe name": "Bhagyashree Umbarkar"
+  },
+  {
+    "no": "44.0",
+    "book name": "Ikigai",
+    "date": "2026-01-16 00:00:00",
+    "employe name": "Chaitanya Moti"
+  },
+  {
+    "no": "45.0",
+    "book name": "The Richest Man in Babylon (own book)",
+    "author": "George s. clason",
+    "employe name": "Prasad Chede"
+  },
+  {
+    "book name": "Say NO without feeling guilty",
+    "employe name": "Aryan Patil"
+  },
+  {
+    "book name": "The monk who sold his ferrari (own book)",
+    "author": "Robin Sharma",
+    "employe name": "Vaishnav Hiwale"
+  }
+]
