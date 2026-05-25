@@ -463,28 +463,32 @@ function bulkMarkAvailable() {
 }
 
 function generateBulkQRCodes() {
-    if (confirm('Generate QR codes for all books that don\'t have them? This may take a while for many books.')) {
-        var button = event.target;
-        var originalText = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
-        button.disabled = true;
+    const useForce = confirm('Do you want to regenerate ALL QR codes? (Click Cancel to only generate missing ones). \n\nNote: If you are on Render, you should click OK to fix broken images.');
+    
+    var button = event.target;
+    var originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+    button.disabled = true;
 
-        ajaxRequest(
-            '/core/bulk_generate_qr/',
-            'POST',
-            null,
-            function(response) {
-                showToast('QR codes generated successfully! Created ' + response.generated + ' QR codes.', 'success');
-                button.innerHTML = originalText;
-                button.disabled = false;
-            },
-            function(status, error) {
-                showToast('Error generating QR codes: ' + error, 'error');
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        );
-    }
+    ajaxRequest(
+        '/core/bulk_generate_qr/',
+        'POST',
+        'force=' + useForce,
+        function(response) {
+            showToast('QR codes processed successfully! Created ' + response.generated + ' QR codes.', 'success');
+            button.innerHTML = originalText;
+            button.disabled = false;
+            // Reload after a short delay to see new images
+            setTimeout(function() {
+                location.reload();
+            }, 2000);
+        },
+        function(status, error) {
+            showToast('Error generating QR codes: ' + error, 'error');
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+    );
 }
 
 // Toast notification function
@@ -520,4 +524,66 @@ function showToast(message, type) {
     toast.addEventListener('hidden.bs.toast', function() {
         toast.remove();
     });
+}
+
+// Utility function for AJAX requests
+function ajaxRequest(url, method, data, successCallback, errorCallback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    
+    // Get CSRF token
+    var csrfToken = getCsrfToken();
+    if (csrfToken) {
+        xhr.setRequestHeader('X-CSRFToken', csrfToken);
+    }
+    
+    if (data) {
+        if (typeof data === 'object') {
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            data = JSON.stringify(data);
+        } else if (typeof data === 'string') {
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        }
+    }
+
+    xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            var response = xhr.responseText;
+            try {
+                response = JSON.parse(response);
+            } catch (e) {}
+            if (successCallback) successCallback(response);
+        } else {
+            if (errorCallback) errorCallback(xhr.status, xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function() {
+        if (errorCallback) errorCallback(xhr.status, 'Network error');
+    };
+
+    xhr.send(data);
+}
+
+// Helper to get CSRF token from cookies
+function getCsrfToken() {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === 'csrftoken=') {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    // Fallback to searching for a hidden input if cookie is not available
+    if (!cookieValue) {
+        var csrfInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        if (csrfInput) {
+            cookieValue = csrfInput.value;
+        }
+    }
+    return cookieValue;
 }

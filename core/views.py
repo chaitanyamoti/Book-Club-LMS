@@ -205,16 +205,20 @@ def bulk_generate_qr(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
 
+    force = request.POST.get('force') == 'true'
     generated = 0
     try:
         from books.utils import generate_qr_code
-        books_without_qr = Book.objects.filter(qr_code='')
-        for book in books_without_qr:
-            if not book.qr_code:
-                generate_qr_code(book)
-                book.save()
-                generated += 1
+        if force:
+            books_to_process = Book.objects.all()
+        else:
+            books_to_process = Book.objects.filter(qr_code='')
+            
+        for book in books_to_process:
+            generate_qr_code(book)
+            book.save()
+            generated += 1
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-    return JsonResponse({'generated': generated})
+    return JsonResponse({'generated': generated, 'force_used': force})

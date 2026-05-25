@@ -12,7 +12,16 @@ def generate_qr_code(book):
         return None
 
     # Generate the URL for the book's scan-and-transact page
-    url = reverse('transactions:scan_and_transact', args=[book.id])
+    path = reverse('transactions:scan_and_transact', args=[book.id])
+    
+    # Use RENDER_EXTERNAL_HOSTNAME to build absolute URL if available
+    from django.conf import settings
+    domain = getattr(settings, 'RENDER_EXTERNAL_HOSTNAME', None)
+    if domain:
+        url = f"https://{domain}{path}"
+    else:
+        # Fallback for local development
+        url = f"http://localhost:8000{path}"
     
     qr = qrcode.QRCode(
         version=1,
