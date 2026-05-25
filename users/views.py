@@ -38,7 +38,7 @@ def register_view(request):
 
 
 def login_view(request):
-    """Custom login view"""
+    """Custom login view that supports both email and username"""
     if request.user.is_authenticated:
         messages.info(request, 'You are already logged in.')
         return redirect('core:dashboard')
@@ -46,16 +46,26 @@ def login_view(request):
     if request.method == 'POST':
         form = CustomLoginForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data.get('email')
+            login_input = form.cleaned_data.get('email') # This field is labeled 'Email' but we can accept username
             password = form.cleaned_data.get('password')
-            user = authenticate(request, username=email, password=password)
+            
+            # 1. Try to authenticate directly with the input (works if input is username)
+            user = authenticate(request, username=login_input, password=password)
+            
+            # 2. If that fails, try to find a user with this email and authenticate with their username
+            if user is None:
+                try:
+                    user_obj = User.objects.get(email=login_input)
+                    user = authenticate(request, username=user_obj.username, password=password)
+                except (User.DoesNotExist, User.MultipleObjectsReturned):
+                    user = None
 
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back, {user.get_full_name() or user.username}!')
                 return redirect('/dashboard/')
             else:
-                messages.error(request, 'Invalid email or password.')
+                messages.error(request, 'Invalid email/username or password.')
     else:
         form = CustomLoginForm()
 

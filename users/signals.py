@@ -10,7 +10,8 @@ from notifications.models import EmailPreference
 def create_user_profile(sender, instance, created, **kwargs):
     """Create related user records whenever a new User is created."""
     if created:
-        UserProfile.objects.create(user=instance)
+        role = 'ADMIN' if instance.is_superuser else 'MEMBER'
+        UserProfile.objects.create(user=instance, role=role)
         EmailPreference.objects.create(user=instance)
 
 
